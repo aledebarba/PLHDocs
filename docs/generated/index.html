@@ -1,0 +1,3294 @@
+<!DOCTYPE html>
+<html lang="pt-BR" data-theme="light">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>SIGEC — Documentação Técnica e de Escopo</title>
+<meta name="description" content="Documentação completa do SIGEC — Sistema de Gestão de Espaços Comuns (Flutter + Cloud Firestore).">
+<style>
+/* ============================================================
+   SIGEC — Folha de estilo única (tela + impressão)
+   Tipografia sem serifa, responsiva, temas claro e escuro.
+   ============================================================ */
+
+:root {
+  --fonte: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, "Helvetica Neue", Arial, sans-serif;
+  --fonte-mono: ui-monospace, SFMono-Regular, "SF Mono", Menlo, Consolas, "Liberation Mono", monospace;
+
+  --bg: #ffffff;
+  --bg-alt: #f6f7f9;
+  --bg-code: #f2f4f7;
+  --bg-sidebar: #fbfbfc;
+  --fg: #16181d;
+  --fg-muted: #5c6472;
+  --fg-faint: #8b93a1;
+  --borda: #e2e5ea;
+  --borda-forte: #c9ced6;
+
+  --acento: #3949ab;
+  --acento-suave: #eef0fb;
+  --acento-fg: #2a3680;
+
+  --verde: #1b7f4b;
+  --verde-bg: #e8f5ee;
+  --amarelo: #8a5a00;
+  --amarelo-bg: #fdf3e0;
+  --vermelho: #b3261e;
+  --vermelho-bg: #fdecea;
+  --azul: #0b5cad;
+  --azul-bg: #e8f1fb;
+
+  --raio: 8px;
+  --sombra: 0 1px 2px rgba(16,24,40,.06), 0 1px 3px rgba(16,24,40,.1);
+  --largura-max: 1400px;
+}
+
+html[data-theme="dark"] {
+  --bg: #0f1115;
+  --bg-alt: #15181e;
+  --bg-code: #1b1f27;
+  --bg-sidebar: #12141a;
+  --fg: #e6e8ec;
+  --fg-muted: #a2a9b6;
+  --fg-faint: #737c8b;
+  --borda: #262b34;
+  --borda-forte: #38404d;
+
+  --acento: #8b9bfa;
+  --acento-suave: #1c2140;
+  --acento-fg: #aab6ff;
+
+  --verde: #5ed69a;
+  --verde-bg: #10291d;
+  --amarelo: #f0bd63;
+  --amarelo-bg: #2b2110;
+  --vermelho: #ff8a80;
+  --vermelho-bg: #2e1512;
+  --azul: #6fb3f5;
+  --azul-bg: #10233a;
+
+  --sombra: 0 1px 2px rgba(0,0,0,.4), 0 1px 3px rgba(0,0,0,.5);
+}
+
+* { box-sizing: border-box; }
+
+html { scroll-behavior: smooth; scroll-padding-top: 80px; }
+
+body {
+  margin: 0;
+  font-family: var(--fonte);
+  font-size: 16px;
+  line-height: 1.65;
+  color: var(--fg);
+  background: var(--bg);
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+/* ---------- Barra superior ---------- */
+.topo {
+  position: sticky; top: 0; z-index: 60;
+  display: flex; align-items: center; gap: 12px;
+  height: 60px; padding: 0 16px;
+  background: color-mix(in srgb, var(--bg) 88%, transparent);
+  backdrop-filter: blur(10px);
+  border-bottom: 1px solid var(--borda);
+}
+
+.marca {
+  display: flex; align-items: center; gap: 10px;
+  font-weight: 700; letter-spacing: -.01em; white-space: nowrap;
+}
+.marca .logo {
+  display: grid; place-items: center;
+  width: 30px; height: 30px; border-radius: 7px;
+  background: var(--acento); color: #fff;
+  font-size: 13px; font-weight: 800;
+}
+.marca small { display: block; font-weight: 400; font-size: 11px; color: var(--fg-muted); letter-spacing: 0; }
+
+.busca-wrap { position: relative; flex: 1; max-width: 520px; margin-left: auto; }
+#busca {
+  width: 100%; height: 38px;
+  padding: 0 70px 0 36px;
+  font: inherit; font-size: 14px;
+  color: var(--fg); background: var(--bg-alt);
+  border: 1px solid var(--borda); border-radius: var(--raio);
+  outline: none; transition: border-color .15s, box-shadow .15s;
+}
+#busca:focus { border-color: var(--acento); box-shadow: 0 0 0 3px var(--acento-suave); }
+#busca::placeholder { color: var(--fg-faint); }
+.busca-icone {
+  position: absolute; left: 11px; top: 50%; transform: translateY(-50%);
+  color: var(--fg-faint); pointer-events: none; font-size: 14px;
+}
+.kbd {
+  position: absolute; right: 8px; top: 50%; transform: translateY(-50%);
+  display: flex; gap: 4px; pointer-events: none;
+}
+.kbd kbd {
+  font-family: var(--fonte-mono); font-size: 11px;
+  padding: 2px 5px; border-radius: 4px;
+  border: 1px solid var(--borda-forte); color: var(--fg-faint);
+  background: var(--bg);
+}
+
+.btn-tema {
+  display: grid; place-items: center;
+  width: 38px; height: 38px; flex: 0 0 38px;
+  background: var(--bg-alt); color: var(--fg);
+  border: 1px solid var(--borda); border-radius: var(--raio);
+  cursor: pointer; font-size: 16px; line-height: 1;
+  transition: background .15s, border-color .15s;
+}
+.btn-tema:hover { background: var(--acento-suave); border-color: var(--acento); }
+
+.btn-menu {
+  display: none; place-items: center;
+  width: 38px; height: 38px; flex: 0 0 38px;
+  background: var(--bg-alt); color: var(--fg);
+  border: 1px solid var(--borda); border-radius: var(--raio);
+  cursor: pointer; font-size: 17px;
+}
+
+/* ---------- Layout ---------- */
+.layout { display: grid; grid-template-columns: 288px minmax(0, 1fr); gap: 0; max-width: var(--largura-max); margin: 0 auto; }
+
+/* ---------- Sumário lateral ---------- */
+#toc {
+  position: sticky; top: 60px;
+  align-self: start;
+  height: calc(100vh - 60px);
+  overflow-y: auto; overscroll-behavior: contain;
+  padding: 20px 14px 60px;
+  background: var(--bg-sidebar);
+  border-right: 1px solid var(--borda);
+  font-size: 13.5px;
+}
+#toc::-webkit-scrollbar { width: 10px; }
+#toc::-webkit-scrollbar-thumb { background: var(--borda-forte); border-radius: 6px; border: 3px solid var(--bg-sidebar); }
+
+#toc .toc-titulo {
+  font-size: 11px; font-weight: 700; text-transform: uppercase;
+  letter-spacing: .09em; color: var(--fg-faint);
+  margin: 0 0 10px 8px;
+}
+#toc ul { list-style: none; margin: 0; padding: 0; }
+#toc li { margin: 1px 0; }
+#toc a {
+  display: block; padding: 5px 9px;
+  color: var(--fg-muted); text-decoration: none;
+  border-radius: 6px; border-left: 2px solid transparent;
+  transition: color .12s, background .12s, border-color .12s;
+}
+#toc a:hover { color: var(--fg); background: var(--bg-alt); }
+#toc a.ativo { color: var(--acento-fg); background: var(--acento-suave); border-left-color: var(--acento); font-weight: 600; }
+#toc .nivel-2 > a { padding-left: 18px; font-size: 13px; }
+#toc .nivel-3 > a { padding-left: 30px; font-size: 12.5px; color: var(--fg-faint); }
+#toc .toc-grupo { margin-top: 16px; padding-top: 12px; border-top: 1px solid var(--borda); }
+
+/* ---------- Conteúdo ---------- */
+main { min-width: 0; padding: 32px 40px 120px; }
+
+h1, h2, h3, h4 { line-height: 1.28; letter-spacing: -.015em; scroll-margin-top: 80px; }
+h1 { font-size: clamp(1.75rem, 1.2rem + 1.6vw, 2.4rem); margin: 0 0 .35em; font-weight: 800; }
+h2 {
+  font-size: clamp(1.32rem, 1.1rem + .8vw, 1.65rem);
+  margin: 2.6em 0 .7em; padding-bottom: .35em;
+  border-bottom: 1px solid var(--borda); font-weight: 700;
+}
+h3 { font-size: 1.16rem; margin: 2em 0 .5em; font-weight: 700; }
+h4 { font-size: 1rem; margin: 1.5em 0 .4em; font-weight: 700; color: var(--fg-muted); }
+
+p { margin: 0 0 1em; }
+a { color: var(--acento-fg); text-decoration-thickness: 1px; text-underline-offset: 2px; }
+
+ul, ol { padding-left: 1.4em; margin: 0 0 1em; }
+li { margin: .3em 0; }
+strong { font-weight: 650; }
+
+hr { border: 0; border-top: 1px solid var(--borda); margin: 2.5em 0; }
+
+code {
+  font-family: var(--fonte-mono); font-size: .885em;
+  background: var(--bg-code); padding: .15em .38em;
+  border-radius: 4px; border: 1px solid var(--borda);
+}
+pre {
+  font-family: var(--fonte-mono); font-size: .855rem; line-height: 1.6;
+  background: var(--bg-code); color: var(--fg);
+  padding: 14px 16px; border-radius: var(--raio);
+  border: 1px solid var(--borda);
+  overflow-x: auto; margin: 0 0 1.2em;
+}
+pre code { background: none; border: 0; padding: 0; font-size: inherit; }
+
+table {
+  width: 100%; border-collapse: collapse;
+  margin: 0 0 1.4em; font-size: .92rem;
+  display: block; overflow-x: auto; white-space: nowrap;
+}
+th, td { padding: 8px 12px; text-align: left; border-bottom: 1px solid var(--borda); vertical-align: top; }
+th { font-weight: 650; font-size: .82rem; text-transform: uppercase; letter-spacing: .04em; color: var(--fg-muted); background: var(--bg-alt); }
+tbody tr:hover { background: var(--bg-alt); }
+td:first-child { font-variant-numeric: tabular-nums; }
+
+/* ---------- Caixas ---------- */
+.caixa {
+  border: 1px solid var(--borda); border-left: 3px solid var(--acento);
+  background: var(--bg-alt); border-radius: var(--raio);
+  padding: 14px 18px; margin: 0 0 1.3em;
+}
+.caixa > :last-child { margin-bottom: 0; }
+.caixa .caixa-titulo { font-weight: 700; margin-bottom: .4em; display: flex; align-items: center; gap: .5em; }
+.caixa.aviso { border-left-color: var(--amarelo); background: var(--amarelo-bg); }
+.caixa.aviso .caixa-titulo { color: var(--amarelo); }
+.caixa.critico { border-left-color: var(--vermelho); background: var(--vermelho-bg); }
+.caixa.critico .caixa-titulo { color: var(--vermelho); }
+.caixa.ok { border-left-color: var(--verde); background: var(--verde-bg); }
+.caixa.ok .caixa-titulo { color: var(--verde); }
+.caixa.info { border-left-color: var(--azul); background: var(--azul-bg); }
+.caixa.info .caixa-titulo { color: var(--azul); }
+
+/* ---------- Etiquetas ---------- */
+.etq {
+  display: inline-block; font-size: .74rem; font-weight: 650;
+  padding: .12em .5em; border-radius: 20px;
+  border: 1px solid var(--borda-forte); color: var(--fg-muted);
+  background: var(--bg-alt); white-space: nowrap; vertical-align: middle;
+}
+.etq.ok { color: var(--verde); background: var(--verde-bg); border-color: color-mix(in srgb, var(--verde) 40%, transparent); }
+.etq.parcial { color: var(--amarelo); background: var(--amarelo-bg); border-color: color-mix(in srgb, var(--amarelo) 40%, transparent); }
+.etq.falta { color: var(--vermelho); background: var(--vermelho-bg); border-color: color-mix(in srgb, var(--vermelho) 40%, transparent); }
+.etq.admin { color: var(--acento-fg); background: var(--acento-suave); border-color: color-mix(in srgb, var(--acento) 40%, transparent); }
+
+/* ---------- Bloco de API ---------- */
+.api {
+  border: 1px solid var(--borda); border-radius: var(--raio);
+  margin: 0 0 1.3em; overflow: hidden;
+  background: var(--bg);
+}
+.api > summary {
+  padding: 12px 16px; cursor: pointer; list-style: none;
+  background: var(--bg-alt); border-bottom: 1px solid transparent;
+  display: flex; align-items: baseline; gap: 10px; flex-wrap: wrap;
+  font-family: var(--fonte-mono); font-size: .9rem;
+  transition: background .12s;
+}
+.api > summary::-webkit-details-marker { display: none; }
+.api > summary::before {
+  content: "▸"; color: var(--fg-faint); font-size: .8em;
+  transition: transform .15s; display: inline-block;
+}
+.api[open] > summary::before { transform: rotate(90deg); }
+.api[open] > summary { border-bottom-color: var(--borda); }
+.api > summary:hover { background: var(--acento-suave); }
+.api .assinatura { font-weight: 650; color: var(--fg); }
+.api .tipo-retorno { color: var(--fg-muted); font-size: .85em; }
+.api .corpo { padding: 16px; }
+.api .corpo > :last-child { margin-bottom: 0; }
+
+/* ---------- Resultados de busca ---------- */
+#painel-busca {
+  position: absolute; top: calc(100% + 6px); left: 0; right: 0;
+  max-height: 62vh; overflow-y: auto;
+  background: var(--bg); border: 1px solid var(--borda-forte);
+  border-radius: var(--raio); box-shadow: 0 12px 32px rgba(16,24,40,.18);
+  z-index: 80; display: none; padding: 6px;
+}
+#painel-busca.aberto { display: block; }
+#painel-busca .vazio { padding: 18px 14px; color: var(--fg-muted); font-size: 14px; text-align: center; }
+#painel-busca .item {
+  display: block; padding: 9px 12px; border-radius: 6px;
+  text-decoration: none; color: var(--fg); cursor: pointer;
+}
+#painel-busca .item .titulo { font-weight: 600; font-size: 14px; }
+#painel-busca .item .contexto { font-size: 12px; color: var(--fg-muted); margin-top: 2px; }
+#painel-busca .item .contexto mark, #painel-busca .item .titulo mark {
+  background: var(--acento-suave); color: var(--acento-fg); border-radius: 2px; padding: 0 2px;
+}
+#painel-busca .item.selecionado { background: var(--acento-suave); }
+#painel-busca .contagem { padding: 6px 12px 8px; font-size: 11px; text-transform: uppercase; letter-spacing: .06em; color: var(--fg-faint); }
+
+/* ---------- Figuras SVG ---------- */
+figure { margin: 0 0 1.6em; }
+figure .figura {
+  border: 1px solid var(--borda); border-radius: var(--raio);
+  background: var(--bg-alt); padding: 16px; overflow-x: auto;
+}
+figure svg { display: block; max-width: 100%; height: auto; margin: 0 auto; }
+figcaption { font-size: .82rem; color: var(--fg-muted); margin-top: .6em; text-align: center; }
+
+/* ---------- Grade de cartões ---------- */
+.grade { display: grid; gap: 14px; grid-template-columns: repeat(auto-fit, minmax(230px, 1fr)); margin: 0 0 1.4em; }
+.cartao {
+  border: 1px solid var(--borda); border-radius: var(--raio);
+  padding: 14px 16px; background: var(--bg-alt);
+}
+.cartao .cartao-rotulo { font-size: .73rem; text-transform: uppercase; letter-spacing: .06em; color: var(--fg-faint); font-weight: 650; }
+.cartao .cartao-valor { font-size: 1.02rem; font-weight: 700; margin-top: 3px; }
+.cartao .cartao-nota { font-size: .82rem; color: var(--fg-muted); margin-top: 4px; }
+
+/* ---------- Responsividade ---------- */
+@media (max-width: 1100px) {
+  .layout { grid-template-columns: 250px minmax(0, 1fr); }
+  main { padding: 28px 28px 100px; }
+}
+
+@media (max-width: 860px) {
+  .layout { grid-template-columns: minmax(0, 1fr); }
+  .btn-menu { display: grid; }
+  #toc {
+    position: fixed; top: 60px; left: 0; bottom: 0;
+    width: 290px; height: auto; z-index: 70;
+    transform: translateX(-102%);
+    transition: transform .22s ease;
+    box-shadow: 0 0 40px rgba(0,0,0,.18);
+  }
+  #toc.aberto { transform: translateX(0); }
+  #veu {
+    display: none; position: fixed; inset: 60px 0 0 0;
+    background: rgba(0,0,0,.42); z-index: 65;
+  }
+  #veu.ativo { display: block; }
+  main { padding: 22px 18px 90px; }
+  .marca small { display: none; }
+  table { font-size: .86rem; }
+  h2 { margin-top: 2em; }
+}
+
+@media (max-width: 560px) {
+  .topo { gap: 8px; padding: 0 10px; }
+  .marca span.txt { display: none; }
+  #busca { padding-right: 40px; font-size: 15px; }
+  .kbd { display: none; }
+  main { padding: 18px 14px 80px; }
+  h1 { font-size: 1.5rem; }
+  h2 { font-size: 1.2rem; }
+  h3 { font-size: 1.05rem; }
+  body { font-size: 15px; }
+  .grade { grid-template-columns: 1fr; }
+  figcaption { text-align: left; }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  html { scroll-behavior: auto; }
+  * { transition: none !important; animation: none !important; }
+}
+
+/* ============================================================
+   IMPRESSÃO — cabeçalho/rodapé, contagem de páginas,
+   controle de órfãs e viúvas.
+   ============================================================ */
+@page {
+  size: A4;
+  margin: 22mm 16mm 20mm 16mm;
+
+  @top-left {
+    content: "SIGEC — Sistema de Gestão de Espaços Comuns";
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 8pt; color: #666;
+  }
+  @top-right {
+    content: "Documentação Técnica · v1.0.0";
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 8pt; color: #666;
+  }
+  @bottom-left {
+    content: "Projeto flutter_application_1 · Firebase projeto-ihc-5530a";
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 7.5pt; color: #888;
+  }
+  @bottom-right {
+    content: "Página " counter(page) " de " counter(pages);
+    font-family: -apple-system, "Segoe UI", Roboto, Arial, sans-serif;
+    font-size: 8pt; color: #444;
+  }
+}
+
+@media print {
+  html, body {
+    background: #fff !important; color: #000 !important;
+    font-size: 10.5pt; line-height: 1.45;
+  }
+  .topo, #toc, #veu, .btn-tema, .btn-menu, .kbd, #painel-busca { display: none !important; }
+  .layout { display: block !important; max-width: none; }
+  main { padding: 0 !important; margin: 0 !important; }
+
+  a { color: #000 !important; text-decoration: none !important; }
+  a[href^="http"]::after {
+    content: " (" attr(href) ")"; font-size: 8pt; color: #555;
+    word-break: break-all;
+  }
+
+  h1, h2, h3, h4 { color: #000 !important; break-after: avoid-page; page-break-after: avoid; }
+  h1 { font-size: 20pt; }
+  h2 { font-size: 14pt; border-bottom: 1px solid #ccc; break-before: auto; page-break-before: auto; }
+  h3 { font-size: 11.5pt; }
+
+  p, li { orphans: 3; widows: 3; }
+  ul, ol { orphans: 2; widows: 2; }
+
+  table { display: table !important; width: 100% !important; white-space: normal !important; font-size: 8.5pt; }
+  thead { display: table-header-group; }
+  tfoot { display: table-footer-group; }
+  tr, img, svg, figure { break-inside: avoid; page-break-inside: avoid; }
+  th, td { border: 1px solid #bbb !important; padding: 4px 6px; }
+
+  pre {
+    white-space: pre-wrap !important; word-break: break-word;
+    background: #f7f7f7 !important; border: 1px solid #ccc !important;
+    font-size: 8pt; break-inside: avoid; page-break-inside: avoid;
+  }
+  code { background: #f2f2f2 !important; border: 0 !important; color: #000 !important; }
+
+  .caixa { background: #fafafa !important; border: 1px solid #bbb !important; border-left-width: 3px !important; break-inside: avoid; page-break-inside: avoid; }
+  .etq { border: 1px solid #999 !important; background: #fff !important; color: #000 !important; }
+  .cartao, .grade { break-inside: avoid; page-break-inside: avoid; }
+
+  .api { break-inside: avoid; page-break-inside: avoid; border: 1px solid #ccc !important; }
+  .api > summary { background: #f4f4f4 !important; }
+  .api .corpo { display: block !important; }
+  details > *:not(summary) { display: block !important; }
+
+  figure .figura { background: #fff !important; border: 1px solid #ccc !important; padding: 8px; }
+
+  .quebra-antes { break-before: page; page-break-before: always; }
+  .evitar-quebra { break-inside: avoid; page-break-inside: avoid; }
+  .sem-impressao { display: none !important; }
+}
+</style>
+</head>
+<body>
+
+<header class="topo">
+  <button class="btn-menu" id="btn-menu" aria-label="Abrir sumário" aria-expanded="false">☰</button>
+  <div class="marca">
+    <span class="logo" aria-hidden="true">SG</span>
+    <span class="txt">SIGEC<small>Documentação técnica</small></span>
+  </div>
+
+  <div class="busca-wrap">
+    <span class="busca-icone" aria-hidden="true">⌕</span>
+    <input
+      id="busca"
+      type="search"
+      placeholder="Buscar na documentação…"
+      autocomplete="off"
+      spellcheck="false"
+      aria-label="Buscar na documentação"
+      aria-controls="painel-busca"
+      aria-expanded="false"
+      role="combobox">
+    <span class="kbd"><kbd>/</kbd><kbd>Esc</kbd></span>
+    <div id="painel-busca" role="listbox" aria-label="Resultados da busca"></div>
+  </div>
+
+  <button class="btn-tema" id="btn-tema" aria-label="Alternar tema claro e escuro" title="Alternar tema">◐</button>
+</header>
+
+<div id="veu"></div>
+
+<div class="layout">
+<nav id="toc" aria-label="Sumário">
+  <p class="toc-titulo">Conteúdo</p>
+  <ul id="toc-lista"></ul>
+</nav>
+
+<main id="conteudo">
+
+<!-- ===================== CAPA / VISÃO GERAL ===================== -->
+<section id="visao-geral">
+<h1>SIGEC — Sistema de Gestão de Espaços Comuns</h1>
+<p style="font-size:1.08rem;color:var(--fg-muted);margin-top:-.4em;">
+Documentação de escopo e referência técnica da aplicação Flutter/Dart para reserva dos espaços comuns de condomínio.
+</p>
+
+<div class="grade">
+  <div class="cartao">
+    <div class="cartao-rotulo">Pacote Dart</div>
+    <div class="cartao-valor"><code>flutter_application_1</code></div>
+    <div class="cartao-nota">versão 1.0.0+1 · SDK ^3.9.2</div>
+  </div>
+  <div class="cartao">
+    <div class="cartao-rotulo">Framework</div>
+    <div class="cartao-valor">Flutter</div>
+    <div class="cartao-nota">&ge; 3.35.0 · Material Design</div>
+  </div>
+  <div class="cartao">
+    <div class="cartao-rotulo">Banco de dados</div>
+    <div class="cartao-valor">Cloud Firestore</div>
+    <div class="cartao-nota">projeto-ihc-5530a · 4 coleções</div>
+  </div>
+  <div class="cartao">
+    <div class="cartao-rotulo">Arquivos Dart</div>
+    <div class="cartao-valor">25 manuais</div>
+    <div class="cartao-nota">+ 1 gerado · 5 órfãos</div>
+  </div>
+</div>
+
+<h2 id="resumo-executivo">Resumo executivo</h2>
+
+<p>O <strong>SIGEC</strong> é uma aplicação <strong>Flutter/Dart</strong> multiplataforma que centraliza a consulta,
+solicitação, aprovação, acompanhamento e cancelamento de reservas dos <strong>espaços comuns</strong> de um condomínio
+residencial. Substitui o controle por planilhas e mensagens informais por um canal único com verificação automatizada
+de regras de utilização.</p>
+
+<p>Dois perfis operam o sistema: <span class="etq">morador</span> (<code>role = 'user'</code>) e
+<span class="etq admin">administrador</span> (<code>role = 'admin'</code>). O morador solicita e acompanha reservas;
+o administrador gerencia moradores, espaços, aprovações e emite relatórios de utilização.</p>
+
+<div class="caixa info">
+  <div class="caixa-titulo">Como ler esta documentação</div>
+  <p>Use o sumário à esquerda ou pressione <kbd>/</kbd> para buscar em todo o documento. O conteúdo está dividido em
+  três blocos: <strong>Escopo</strong> (produto, regras, requisitos), <strong>Arquitetura</strong> (stack, dados, segurança)
+  e <strong>Referência de código</strong> (documentação por arquivo, camada a camada).</p>
+</div>
+
+<div class="caixa aviso">
+  <div class="caixa-titulo">Convenção de incerteza</div>
+  <p>Toda afirmação que não pôde ser derivada do código, da configuração ou do <code>README.md</code> está marcada com
+  <strong>⚠️ Não determinado a partir do código</strong>. Nenhuma suposição foi registrada como fato.</p>
+</div>
+
+<h2 id="objetivos">Objetivos do produto</h2>
+
+<table>
+  <thead><tr><th>ID</th><th>Objetivo</th><th>Fonte</th></tr></thead>
+  <tbody>
+    <tr><td>OBJ-01</td><td>Ser o canal único de reserva dos espaços comuns</td><td><code>README.md</code></td></tr>
+    <tr><td>OBJ-02</td><td>Automatizar a verificação de regras e disponibilidade</td><td><code>README.md</code></td></tr>
+    <tr><td>OBJ-03</td><td>Oferecer à administração mecanismo de aprovação e acompanhamento</td><td><code>README.md</code></td></tr>
+    <tr><td>OBJ-04</td><td>Manter histórico das reservas para consulta e relatório</td><td><code>README.md</code>, RF-10</td></tr>
+  </tbody>
+</table>
+
+<p><span class="etq parcial">⚠️ Não determinado</span> Metas quantitativas (tempo médio de reserva, número de moradores
+atendidos, SLA de resposta) não constam no repositório.</p>
+
+<h2 id="problema-negocio">Problema de negócio</h2>
+
+<table>
+  <thead><tr><th>Situação anterior</th><th>Situação proposta</th></tr></thead>
+  <tbody>
+    <tr><td>Reservas em planilhas e mensagens</td><td>Registro único em banco de dados central</td></tr>
+    <tr><td>Conflito descoberto no uso do espaço</td><td>Bloqueio no momento da solicitação</td></tr>
+    <tr><td>Regras verificadas manualmente</td><td>Verificação automatizada no cliente</td></tr>
+    <tr><td>Administração sem visão consolidada</td><td>Relatório por período e por espaço</td></tr>
+    <tr><td>Aprovação comunicada informalmente</td><td>Notificação in-app direcionada ao morador</td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ===================== PERFIS ===================== -->
+<section id="perfis">
+<h2 id="perfis-usuario">Perfis de usuário</h2>
+
+<table>
+  <thead><tr><th>Perfil</th><th><code>role</code></th><th>Descrição</th><th>Capacidades</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Morador</strong></td><td><code>user</code></td>
+      <td>Residente de uma unidade do condomínio</td>
+      <td>Consultar espaços, verificar regras, solicitar reserva, acompanhar status, cancelar reservas próprias, receber notificações</td>
+    </tr>
+    <tr>
+      <td><strong>Administrador</strong></td><td><code>admin</code></td>
+      <td>Gestor do condomínio</td>
+      <td>Tudo do morador + gerenciar moradores, gerenciar espaços, aprovar/recusar reservas, editar reservas, emitir relatório</td>
+    </tr>
+  </tbody>
+</table>
+
+<p>O perfil é lido do campo <code>role</code> no documento de <code>users</code>. A distinção na interface é feita por
+comparação de string, com critério <strong>inconsistente</strong> entre telas: <code>main.dart</code> usa
+<code>role == 'admin'</code>, enquanto outras páginas usam <code>role.toLowerCase() == 'admin'</code>.</p>
+
+<h2 id="espacos-abrangidos">Espaços abrangidos</h2>
+
+<p>Conforme o <code>README.md</code>, o sistema gerencia seis espaços: salão de festas, churrasqueira, salão gourmet,
+quadra esportiva, espaço kids e academia.</p>
+
+<div class="caixa info">
+  <div class="caixa-titulo">Os espaços não são fixos em código</div>
+  <p>Espaços são documentos da coleção <code>espacos</code>, cadastrados pelo administrador em <code>SpacesPage</code>.
+  A lista acima é o escopo funcional declarado; a cardinalidade real depende do cadastro efetuado. Nenhum espaço é
+  semeado pelo código, e a aplicação exige um <code>admin</code> previamente criado em <code>users</code> para operar.</p>
+</div>
+</section>
+
+<!-- ===================== ARQUITETURA ===================== -->
+<section id="arquitetura">
+<h2 id="arquitetura-geral">Arquitetura</h2>
+
+<p>A aplicação adota uma arquitetura em três camadas dentro de um único projeto Flutter, sem gerenciador de estado de
+terceiros e sem injeção de dependência. A comunicação com o backend ocorre exclusivamente via SDK do Cloud Firestore.</p>
+
+<figure>
+<div class="figura">
+<svg viewBox="0 0 820 470" role="img" aria-labelledby="svg-arq-titulo svg-arq-desc" xmlns="http://www.w3.org/2000/svg">
+  <title id="svg-arq-titulo">Diagrama de camadas da arquitetura do SIGEC</title>
+  <desc id="svg-arq-desc">Quatro camadas empilhadas: apresentação (páginas Flutter), estado e serviços (ChangeNotifier e services), persistência (Cloud Firestore e SharedPreferences) e infraestrutura (Firebase Core e plataformas).</desc>
+  <defs>
+    <marker id="seta" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#8b93a1"/>
+    </marker>
+  </defs>
+
+  <!-- Camada 1 -->
+  <rect x="20" y="16" width="780" height="96" rx="8" fill="#eef0fb" stroke="#3949ab" stroke-width="1.2"/>
+  <text x="36" y="40" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="700" fill="#2a3680">CAMADA DE APRESENTAÇÃO — Widgets Flutter</text>
+  <g font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#16181d">
+    <rect x="36" y="52" width="106" height="26" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="89" y="69" text-anchor="middle">LoginPage</text>
+    <rect x="152" y="52" width="106" height="26" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="205" y="69" text-anchor="middle">MyHomePage</text>
+    <rect x="268" y="52" width="120" height="26" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="328" y="69" text-anchor="middle">SpacesPage</text>
+    <rect x="398" y="52" width="140" height="26" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="468" y="69" text-anchor="middle">MinhasReservas</text>
+    <rect x="548" y="52" width="130" height="26" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="613" y="69" text-anchor="middle">AnalisePage</text>
+    <rect x="688" y="52" width="96" height="26" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="736" y="69" text-anchor="middle">UserCrud</text>
+    <rect x="36" y="84" width="106" height="22" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="89" y="99" text-anchor="middle" font-size="9.5">ReservarEspaco</text>
+    <rect x="152" y="84" width="106" height="22" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="205" y="99" text-anchor="middle" font-size="9.5">ReservasAdmin</text>
+    <rect x="268" y="84" width="120" height="22" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="328" y="99" text-anchor="middle" font-size="9.5">Notifications</text>
+    <rect x="398" y="84" width="140" height="22" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="468" y="99" text-anchor="middle" font-size="9.5">DashboardRelatorio</text>
+    <rect x="548" y="84" width="130" height="22" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="613" y="99" text-anchor="middle" font-size="9.5">AllReservasUser</text>
+    <rect x="688" y="84" width="96" height="22" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="736" y="99" text-anchor="middle" font-size="9.5">Documentacao</text>
+  </g>
+
+  <!-- Seta 1 -->
+  <line x1="410" y1="112" x2="410" y2="140" stroke="#8b93a1" stroke-width="1.4" marker-end="url(#seta)"/>
+
+  <!-- Camada 2 -->
+  <rect x="20" y="144" width="780" height="86" rx="8" fill="#e8f1fb" stroke="#0b5cad" stroke-width="1.2"/>
+  <text x="36" y="166" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="700" fill="#0b5cad">CAMADA DE ESTADO E SERVIÇOS — ChangeNotifier + Service Objects</text>
+  <g font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#16181d">
+    <rect x="36" y="176" width="150" height="40" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="111" y="192" text-anchor="middle" font-weight="600">AuthService</text>
+    <text x="111" y="206" text-anchor="middle" font-size="9" fill="#5c6472">ChangeNotifier</text>
+    <rect x="196" y="176" width="150" height="40" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="271" y="192" text-anchor="middle" font-weight="600">UserService</text>
+    <text x="271" y="206" text-anchor="middle" font-size="9" fill="#5c6472">ChangeNotifier</text>
+    <rect x="356" y="176" width="130" height="40" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="421" y="192" text-anchor="middle" font-weight="600">SpaceService</text>
+    <rect x="496" y="176" width="140" height="40" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="566" y="192" text-anchor="middle" font-weight="600">ReservasService</text>
+    <rect x="646" y="176" width="138" height="18" rx="4" fill="#fff" stroke="#c9ced6"/>
+    <text x="715" y="189" text-anchor="middle" font-size="9">NotificationService</text>
+    <rect x="646" y="198" width="138" height="18" rx="4" fill="#fff" stroke="#c9ced6"/>
+    <text x="715" y="211" text-anchor="middle" font-size="9">DashboardRelatorio</text>
+  </g>
+
+  <!-- Seta 2 -->
+  <line x1="410" y1="232" x2="410" y2="260" stroke="#8b93a1" stroke-width="1.4" marker-end="url(#seta)"/>
+
+  <!-- Camada 3 -->
+  <rect x="20" y="264" width="780" height="80" rx="8" fill="#e8f5ee" stroke="#1b7f4b" stroke-width="1.2"/>
+  <text x="36" y="286" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="700" fill="#1b7f4b">CAMADA DE PERSISTÊNCIA</text>
+  <rect x="36" y="296" width="330" height="38" rx="5" fill="#fff" stroke="#c9ced6"/>
+  <text x="201" y="312" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="600" fill="#16181d">Cloud Firestore (remoto)</text>
+  <text x="201" y="326" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9.5" fill="#5c6472">users · espacos · reservas · notificacoes</text>
+  <rect x="386" y="296" width="230" height="38" rx="5" fill="#fff" stroke="#c9ced6"/>
+  <text x="501" y="312" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="600" fill="#16181d">SharedPreferences (local)</text>
+  <text x="501" y="326" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9.5" fill="#5c6472">username · role · ind_habilitado · users_list</text>
+  <rect x="636" y="296" width="148" height="38" rx="5" fill="#fff" stroke="#c9ced6"/>
+  <text x="710" y="312" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="11" font-weight="600" fill="#16181d">Firestore Rules</text>
+  <text x="710" y="326" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9" fill="#b3261e">allow if true</text>
+
+  <!-- Seta 3 -->
+  <line x1="410" y1="346" x2="410" y2="374" stroke="#8b93a1" stroke-width="1.4" marker-end="url(#seta)"/>
+
+  <!-- Camada 4 -->
+  <rect x="20" y="378" width="780" height="76" rx="8" fill="#f6f7f9" stroke="#c9ced6" stroke-width="1.2"/>
+  <text x="36" y="400" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="12" font-weight="700" fill="#5c6472">INFRAESTRUTURA E PLATAFORMA</text>
+  <g font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10.5" fill="#16181d">
+    <rect x="36" y="410" width="150" height="30" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="111" y="429" text-anchor="middle">Firebase Core 4.2.1</text>
+    <rect x="196" y="410" width="130" height="30" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="261" y="429" text-anchor="middle">Android</text>
+    <rect x="336" y="410" width="110" height="30" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="391" y="429" text-anchor="middle">iOS / macOS</text>
+    <rect x="456" y="410" width="110" height="30" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="511" y="429" text-anchor="middle">Web / Windows</text>
+    <rect x="576" y="410" width="100" height="30" rx="5" fill="#fdecea" stroke="#b3261e"/>
+    <text x="626" y="429" text-anchor="middle" fill="#b3261e">Linux ✕</text>
+    <rect x="686" y="410" width="98" height="30" rx="5" fill="#fff" stroke="#c9ced6"/>
+    <text x="735" y="429" text-anchor="middle" font-size="9.5">flutter_lints</text>
+  </g>
+</svg>
+</div>
+<figcaption>Figura 1 — Camadas da aplicação. A camada Linux está marcada com ✕ porque <code>firebase_options.dart</code> lança <code>UnsupportedError</code> nessa plataforma.</figcaption>
+</figure>
+
+<h3 id="stack">Stack tecnológica</h3>
+
+<table>
+  <thead><tr><th>Camada</th><th>Tecnologia</th><th>Versão</th></tr></thead>
+  <tbody>
+    <tr><td>Linguagem</td><td>Dart</td><td><code>^3.9.2</code></td></tr>
+    <tr><td>UI</td><td>Flutter / Material Design</td><td><code>&ge;3.35.0</code></td></tr>
+    <tr><td>Estado</td><td><code>setState</code> local + <code>ChangeNotifier</code>/<code>AnimatedBuilder</code></td><td>nativo</td></tr>
+    <tr><td>Persistência remota</td><td>Cloud Firestore</td><td><code>6.1.0</code></td></tr>
+    <tr><td>Persistência local</td><td>SharedPreferences</td><td><code>2.5.3</code></td></tr>
+    <tr><td>Bootstrap</td><td>Firebase Core</td><td><code>4.2.1</code></td></tr>
+    <tr><td>Formatação</td><td>intl (<code>DateFormat</code>, <code>NumberFormat.currency</code> pt_BR)</td><td><code>0.18.1</code></td></tr>
+    <tr><td>Ícones</td><td>cupertino_icons (declarado, uso não localizado)</td><td><code>1.0.8</code></td></tr>
+    <tr><td>Lint</td><td>flutter_lints (posicionado em bloco atípico no pubspec)</td><td><code>^5.0.0</code></td></tr>
+  </tbody>
+</table>
+
+<p><strong>Não utilizadas:</strong> nenhum gerenciador de estado de terceiros (Provider, Riverpod, Bloc, GetX); nenhum
+injetor de dependência; nenhuma biblioteca de rotas declarativas — a navegação é imperativa com
+<code>Navigator.push</code> e <code>MaterialPageRoute</code>.</p>
+</section>
+
+<!-- ===================== MODELO DE DADOS ===================== -->
+<section id="modelo-dados">
+<h2 id="modelo-firestore">Modelo de dados — Cloud Firestore</h2>
+
+<p>Banco NoSQL orientado a documentos, projeto <code>projeto-ihc-5530a</code>. Quatro coleções efetivamente usadas e uma
+declarada apenas em regras.</p>
+
+<figure>
+<div class="figura">
+<svg viewBox="0 0 830 560" role="img" aria-labelledby="svg-dados-titulo svg-dados-desc" xmlns="http://www.w3.org/2000/svg">
+  <title id="svg-dados-titulo">Modelo de documentos do Cloud Firestore</title>
+  <desc id="svg-dados-desc">Diagrama com quatro coleções: users, espacos, reservas e notificacoes. Reservas referencia users por id_morador e users por id_unidade, e guarda o nome do espaço como string em vez de referência.</desc>
+
+  <!-- users -->
+  <rect x="14" y="14" width="252" height="228" rx="8" fill="#eef0fb" stroke="#3949ab" stroke-width="1.4"/>
+  <rect x="14" y="14" width="252" height="30" rx="8" fill="#3949ab"/>
+  <rect x="14" y="36" width="252" height="8" fill="#3949ab"/>
+  <text x="140" y="35" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#fff">users</text>
+  <g font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#16181d">
+    <text x="28" y="62" font-weight="700">login</text><text x="128" y="62" fill="#5c6472">String · ID</text>
+    <text x="28" y="80" font-weight="700">role</text><text x="128" y="80" fill="#5c6472">'admin' | 'user'</text>
+    <text x="28" y="98">nome</text><text x="128" y="98" fill="#5c6472">String</text>
+    <text x="28" y="116">cpf</text><text x="128" y="116" fill="#5c6472">String (dígitos)</text>
+    <text x="28" y="134">email</text><text x="128" y="134" fill="#5c6472">String</text>
+    <text x="28" y="152">telefone</text><text x="128" y="152" fill="#5c6472">String</text>
+    <text x="28" y="170" font-weight="700">id_apartamento</text><text x="150" y="170" fill="#5c6472">String</text>
+    <text x="28" y="188" font-weight="700">ind_habilitado</text><text x="150" y="188" fill="#5c6472">'S' | 'N'</text>
+    <text x="28" y="206" fill="#b3261e">senha</text><text x="128" y="206" fill="#b3261e">texto plano ⚠</text>
+    <text x="28" y="224">data_cadastro</text><text x="128" y="224" fill="#5c6472">Timestamp</text>
+  </g>
+
+  <!-- espacos -->
+  <rect x="564" y="14" width="252" height="228" rx="8" fill="#e8f5ee" stroke="#1b7f4b" stroke-width="1.4"/>
+  <rect x="564" y="14" width="252" height="30" rx="8" fill="#1b7f4b"/>
+  <rect x="564" y="36" width="252" height="8" fill="#1b7f4b"/>
+  <text x="690" y="35" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#fff">espacos</text>
+  <g font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#16181d">
+    <text x="578" y="62" font-weight="700">nome</text><text x="668" y="62" fill="#5c6472">String · ID sanit.</text>
+    <text x="578" y="80">qtd_pessoas</text><text x="678" y="80" fill="#5c6472">Int</text>
+    <text x="578" y="98">horario_abertura</text><text x="698" y="98" fill="#5c6472">HH:MM</text>
+    <text x="578" y="116">horario_fechamento</text><text x="708" y="116" fill="#5c6472">HH:MM</text>
+    <text x="578" y="134">custo_reserva</text><text x="688" y="134" fill="#5c6472">Int</text>
+    <text x="578" y="152">regras_uso</text><text x="668" y="152" fill="#5c6472">String</text>
+    <text x="578" y="170">status_disponivel</text><text x="708" y="170" fill="#5c6472">'S' | 'N'</text>
+    <text x="578" y="188">motivo_interdicao</text><text x="708" y="188" fill="#5c6472">String?</text>
+    <text x="578" y="206">prazo_inter</text><text x="668" y="206" fill="#5c6472">Int? (dias)</text>
+    <text x="578" y="224" fill="#8b93a1">id (só em memória)</text><text x="708" y="224" fill="#8b93a1">eco do ID</text>
+  </g>
+
+  <!-- reservas -->
+  <rect x="14" y="300" width="802" height="152" rx="8" fill="#fdf3e0" stroke="#8a5a00" stroke-width="1.4"/>
+  <rect x="14" y="300" width="802" height="30" rx="8" fill="#8a5a00"/>
+  <rect x="14" y="322" width="802" height="8" fill="#8a5a00"/>
+  <text x="415" y="321" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#fff">reservas</text>
+  <g font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#16181d">
+    <text x="28" y="348" font-weight="700">espaco</text><text x="118" y="348" fill="#b3261e">String (nome, não ID) ⚠</text>
+    <text x="330" y="348" font-weight="700">data_reserva</text><text x="440" y="348" fill="#5c6472">Timestamp</text>
+    <text x="580" y="348" font-weight="700">status</text><text x="642" y="348" fill="#5c6472">PENDENTE | ACEITA | …</text>
+
+    <text x="28" y="368" font-weight="700">id_morador</text><text x="128" y="368" fill="#2a3680">→ users (login)</text>
+    <text x="330" y="368" font-weight="700">id_unidade</text><text x="430" y="368" fill="#2a3680">→ users.id_apartamento</text>
+    <text x="580" y="368">qtd_convidados</text><text x="690" y="368" fill="#5c6472">Int (+1)</text>
+
+    <text x="28" y="388">hora_inicio</text><text x="118" y="388" fill="#5c6472">HH:MM</text>
+    <text x="330" y="388">hora_fim</text><text x="420" y="388" fill="#5c6472">HH:MM</text>
+    <text x="580" y="388">observacoes</text><text x="690" y="388" fill="#5c6472">String?</text>
+
+    <text x="28" y="408">data_criacao</text><text x="128" y="408" fill="#5c6472">serverTs</text>
+    <text x="330" y="408">data_cancelamento</text><text x="470" y="408" fill="#5c6472">serverTs</text>
+    <text x="580" y="408">motivo_cancelamento</text><text x="730" y="408" fill="#5c6472">String?</text>
+
+    <text x="28" y="428" fill="#8b93a1">id_reserva (epoch ms, redundante)</text>
+  </g>
+
+  <!-- notificacoes -->
+  <rect x="14" y="478" width="802" height="70" rx="8" fill="#e8f1fb" stroke="#0b5cad" stroke-width="1.4"/>
+  <rect x="14" y="478" width="802" height="26" rx="8" fill="#0b5cad"/>
+  <rect x="14" y="496" width="802" height="8" fill="#0b5cad"/>
+  <text x="415" y="496" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="700" fill="#fff">notificacoes</text>
+  <g font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#16181d">
+    <text x="28" y="520" font-weight="700">destinatario_id</text><text x="152" y="520" fill="#2a3680">→ users (ID)</text>
+    <text x="330" y="520">titulo</text><text x="400" y="520" fill="#5c6472">String</text>
+    <text x="530" y="520">lida</text><text x="580" y="520" fill="#5c6472">Bool</text>
+    <text x="640" y="520">tipo</text><text x="690" y="520" fill="#5c6472">aviso | reserva_aceita |…</text>
+    <text x="28" y="538">mensagem</text><text x="110" y="538" fill="#5c6472">String</text>
+    <text x="330" y="538">data_criacao</text><text x="430" y="538" fill="#5c6472">serverTs</text>
+  </g>
+
+  <!-- relações -->
+  <line x1="140" y1="242" x2="140" y2="300" stroke="#2a3680" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <text x="146" y="270" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#2a3680">1 : N (id_morador)</text>
+
+  <line x1="660" y1="242" x2="660" y2="300" stroke="#b3261e" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <text x="666" y="270" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#b3261e">por nome, sem FK</text>
+
+  <line x1="140" y1="452" x2="140" y2="478" stroke="#0b5cad" stroke-width="1.3" stroke-dasharray="4 3"/>
+  <text x="146" y="470" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#0b5cad">1 : N</text>
+</svg>
+</div>
+<figcaption>Figura 2 — Coleções e campos inferidos do código. Linhas tracejadas indicam associações lógicas; não há integridade referencial imposta pelo Firestore.</figcaption>
+</figure>
+
+<h3 id="caracteristicas-modelo">Características do modelo</h3>
+
+<ul>
+  <li><strong>Sem integridade referencial</strong> — <code>reservas.id_morador</code> e <code>reservas.espaco</code> são
+  strings soltas; nenhum vínculo por referência de documento é imposto.</li>
+  <li><strong>Chave natural em espaços</strong> — o document ID de <code>espacos</code> é o nome sanitizado
+  (<code>_sanitizeId</code> troca <code>\</code> e <code>/</code> por <code>-</code>). Renomear exige criar o novo
+  documento e apagar o antigo.</li>
+  <li><strong>Denormalização de nome</strong> — <code>reservas.espaco</code> guarda o nome, não o ID; renomear um espaço
+  <em>não</em> atualiza reservas existentes.</li>
+  <li><strong>Índice único</strong> — <code>reservas(id_unidade ASC, data_reserva ASC)</code>, em
+  <code>firestore.indexes.json</code>.</li>
+</ul>
+
+<h3 id="colecao-nao-usada">Coleção declarada e não utilizada</h3>
+
+<p><code>limites_reservas_por_unidade/{unidadeId}</code> consta em <code>firestore.rules</code> com
+<code>allow read, write: if true</code>, mas <strong>nenhum código em <code>lib/</code> a referencia</strong>. O limite de
+duas reservas futuras é calculado em memória em <code>reservas_user_page._criarReserva</code>.</p>
+
+<p><span class="etq parcial">⚠️ Não determinado</span> Provável resíduo de tentativa anterior de controle server-side.</p>
+</section>
+
+<!-- ===================== REGRAS DE DOMÍNIO ===================== -->
+<section id="regras">
+<h2 id="regras-dominio">Regras de domínio</h2>
+
+<p>Fonte normativa: <code>doc/domain_rules.md</code>. A coluna «Implementação» indica onde cada regra é efetivamente
+verificada, e a etiqueta final resume a cobertura.</p>
+
+<table>
+  <thead><tr><th>ID</th><th>Regra</th><th>Mecanismo no código</th><th>Camada</th><th>Status</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>RD-01</strong></td><td>Até 2 reservas futuras por unidade</td>
+      <td><code>reservas_user_page._criarReserva</code> conta reservas da unidade com status ativo e <code>hora_fim &gt; agora</code>; bloqueia em <code>&gt;= 2</code></td>
+      <td>Cliente</td><td><span class="etq ok">implementada</span></td>
+    </tr>
+    <tr>
+      <td><strong>RD-02</strong></td><td>Salão exige antecedência de 48 h</td>
+      <td><code>_criarReserva</code> detecta <code>'salão'</code>/<code>'salao'</code> no nome e compara com <code>now + 48h</code></td>
+      <td>Cliente</td><td><span class="etq ok">implementada</span></td>
+    </tr>
+    <tr>
+      <td><strong>RD-03</strong></td><td>Sem duas reservas da unidade no mesmo horário</td>
+      <td><code>_criarReserva</code> verifica interseção de intervalos <code>[inicio, fim)</code> na mesma data</td>
+      <td>Cliente</td><td><span class="etq ok">implementada</span></td>
+    </tr>
+    <tr>
+      <td><strong>RD-04</strong></td><td>Salão e churrasqueira exigem aprovação</td>
+      <td><code>analise_page</code> lista <code>PENDENTE</code> e permite aceitar/recusar</td>
+      <td>Cliente</td><td><span class="etq parcial">parcial</span></td>
+    </tr>
+    <tr>
+      <td><strong>RD-05</strong></td><td>Cancelamento com antecedência de 24 h</td>
+      <td><code>ReservasService.cancelarReserva</code> verifica <strong>somente se <code>status == 'ACEITA'</code></strong>, dentro de <code>runTransaction</code></td>
+      <td>Cliente (transacional)</td><td><span class="etq parcial">parcial</span></td>
+    </tr>
+    <tr>
+      <td><strong>RD-06</strong></td><td>Reserva vinculada a uma unidade</td>
+      <td><code>reservas_user_page</code> valida <code>id_apartamento</code>; <code>firestore.rules</code> exige <code>id_unidade</code> não vazia</td>
+      <td>Cliente + regra</td><td><span class="etq ok">implementada</span></td>
+    </tr>
+    <tr>
+      <td><strong>RD-07</strong></td><td>Respeitar horário de funcionamento</td>
+      <td><code>_criarReserva</code> compara com <code>horario_abertura</code>/<code>horario_fechamento</code></td>
+      <td>Cliente</td><td><span class="etq ok">implementada</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="lacunas-regras">Lacunas de implementação</h3>
+
+<div class="caixa aviso">
+  <div class="caixa-titulo">RD-04 — a distinção por espaço não existe</div>
+  <p>A regra documentada prevê aprovação obrigatória apenas para <strong>salão de festas</strong> e
+  <strong>churrasqueira</strong>. No código, <em>toda</em> reserva nasce com <code>status: 'PENDENTE'</code> e passa pelo
+  fluxo de aprovação em <code>AnalisePage</code>, independentemente do espaço. Não há atributo no cadastro de
+  <code>espacos</code> que indique «requer aprovação».</p>
+</div>
+
+<div class="caixa aviso">
+  <div class="caixa-titulo">RD-05 — o prazo não se aplica a reservas pendentes</div>
+  <p><code>cancelarReserva</code> só verifica as 24 horas quando o status é <code>ACEITA</code>. Reservas
+  <code>PENDENTE</code> podem ser canceladas a qualquer momento, inclusive faltando poucos minutos.</p>
+</div>
+
+<div class="caixa aviso">
+  <div class="caixa-titulo">RD-01 e RD-03 — somente no cliente, sem transação</div>
+  <p>Ambas as verificações são executadas no dispositivo antes do <code>set()</code>. A criação de reserva
+  <strong>não é transacional</strong>, portanto duas solicitações concorrentes podem violar as duas regras. Somente RD-06
+  tem reforço no servidor, via <code>firestore.rules</code>.</p>
+</div>
+
+<h3 id="regras-nao-documentadas">Regras efetivas não documentadas</h3>
+
+<p>O código impõe restrições adicionais que <strong>não constam</strong> em <code>doc/domain_rules.md</code>:</p>
+
+<table>
+  <thead><tr><th>Regra efetiva</th><th>Local</th><th>Efeito</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><strong>Uma reserva por espaço por dia</strong></td>
+      <td><code>reservas_user_page._criarReserva</code>, <code>ReservasService.criarReserva</code>, <code>reagendarReserva</code></td>
+      <td>Impede segunda reserva do mesmo espaço na mesma data, mesmo em horário distinto — <strong>mais restritivo</strong> que RD-03</td>
+    </tr>
+    <tr>
+      <td>Capacidade máxima = <code>qtd_pessoas</code></td>
+      <td><code>reservas_user_page._criarReserva</code></td>
+      <td>Bloqueia quando convidados + proprietário excede a capacidade do espaço</td>
+    </tr>
+    <tr>
+      <td><code>hora_inicio &lt; hora_fim</code></td>
+      <td><code>reservas_user_page</code>, <code>reservas_admin_page</code>, <code>space_page</code></td>
+      <td>Rejeita intervalos vazios ou invertidos</td>
+    </tr>
+    <tr>
+      <td>Interdição rejeita reservas em lote</td>
+      <td><code>space_page._atualizarReservasAssociadas</code></td>
+      <td>Todas as reservas do espaço passam a <code>REJEITADA</code> via <code>batch</code></td>
+    </tr>
+    <tr>
+      <td>Unicidade de <code>id_apartamento</code></td>
+      <td><code>user_service.addUserWithPassword</code>, <code>updateUser</code></td>
+      <td>Impede dois usuários com o mesmo apartamento</td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="ciclo-reserva">Ciclo de vida da reserva</h3>
+
+<figure>
+<div class="figura">
+<svg viewBox="0 0 800 340" role="img" aria-labelledby="svg-ciclo-titulo svg-ciclo-desc" xmlns="http://www.w3.org/2000/svg">
+  <title id="svg-ciclo-titulo">Ciclo de vida dos estados de uma reserva</title>
+  <desc id="svg-ciclo-desc">Diagrama de estados: PENDENTE criado pelo morador, transita para ACEITA via aprovação ou REJEITADA via recusa, e de ACEITA para CANCELADA pelo morador. REJEITADA também recebe reservas em lote quando um espaço é interditado. O estado REALIZADA está previsto na interface mas não é produzido por nenhum código.</desc>
+  <defs>
+    <marker id="seta2" markerWidth="10" markerHeight="10" refX="8" refY="3.2" orient="auto">
+      <path d="M0,0 L0,6.4 L8,3.2 z" fill="#5c6472"/>
+    </marker>
+    <marker id="seta3" markerWidth="10" markerHeight="10" refX="8" refY="3.2" orient="auto">
+      <path d="M0,0 L0,6.4 L8,3.2 z" fill="#b3261e"/>
+    </marker>
+  </defs>
+
+  <!-- PENDENTE -->
+  <rect x="34" y="130" width="150" height="56" rx="28" fill="#fdf3e0" stroke="#8a5a00" stroke-width="1.6"/>
+  <text x="109" y="155" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#8a5a00">PENDENTE</text>
+  <text x="109" y="172" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#5c6472">criado pelo morador</text>
+
+  <!-- ACEITA -->
+  <rect x="316" y="40" width="150" height="56" rx="28" fill="#e8f5ee" stroke="#1b7f4b" stroke-width="1.6"/>
+  <text x="391" y="65" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#1b7f4b">ACEITA</text>
+  <text x="391" y="82" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#5c6472">aprovada pelo admin</text>
+
+  <!-- REJEITADA -->
+  <rect x="316" y="214" width="150" height="56" rx="28" fill="#fdecea" stroke="#b3261e" stroke-width="1.6"/>
+  <text x="391" y="239" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#b3261e">REJEITADA</text>
+  <text x="391" y="256" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#5c6472">recusa ou interdição</text>
+
+  <!-- CANCELADA -->
+  <rect x="600" y="40" width="150" height="56" rx="28" fill="#e8f1fb" stroke="#0b5cad" stroke-width="1.6"/>
+  <text x="675" y="65" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#0b5cad">CANCELADA</text>
+  <text x="675" y="82" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#5c6472">morador, ≥ 24 h</text>
+
+  <!-- REALIZADA -->
+  <rect x="600" y="214" width="150" height="56" rx="28" fill="#f6f7f9" stroke="#c9ced6" stroke-width="1.6" stroke-dasharray="6 4"/>
+  <text x="675" y="239" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12.5" font-weight="700" fill="#8b93a1">REALIZADA</text>
+  <text x="675" y="256" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#b3261e">nunca produzido ⚠</text>
+
+  <!-- transições -->
+  <path d="M184,150 C240,150 250,68 310,68" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#seta2)"/>
+  <text x="238" y="112" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9.5" fill="#5c6472">admin aceita</text>
+
+  <path d="M184,172 C240,172 250,242 310,242" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#seta2)"/>
+  <text x="238" y="216" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9.5" fill="#5c6472">admin recusa</text>
+
+  <path d="M466,68 L594,68" fill="none" stroke="#5c6472" stroke-width="1.5" marker-end="url(#seta2)"/>
+  <text x="530" y="60" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9.5" fill="#5c6472">morador cancela</text>
+
+  <path d="M184,130 C220,80 240,60 300,52" fill="none" stroke="#b3261e" stroke-width="1.2" stroke-dasharray="5 4" marker-end="url(#seta3)"/>
+  <text x="120" y="42" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#b3261e">interdição do espaço</text>
+  <text x="120" y="54" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#b3261e">(batch → REJEITADA)</text>
+
+  <text x="34" y="316" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#b3261e">⚠ REALIZADA é previsto na UI (cores/labels) mas nenhum caminho de código o atribui — não há rotina de encerramento por data.</text>
+</svg>
+</div>
+<figcaption>Figura 3 — Transições de estado. <code>REJEITADA</code> acumula três origens distintas; <code>REALIZADA</code> está desenhado com traço tracejado por nunca ser produzido.</figcaption>
+</figure>
+</section>
+
+<!-- ===================== REQUISITOS ===================== -->
+<section id="requisitos">
+<h2 id="requisitos-funcionais">Requisitos funcionais</h2>
+
+<p>Reproduzidos de <code>doc/requirements.md</code>, com o status de cobertura apurado por leitura de código.</p>
+
+<table>
+  <thead><tr><th>ID</th><th>Descrição</th><th>Cobertura</th></tr></thead>
+  <tbody>
+    <tr><td>RF-01</td><td>Permitir que o morador realize autenticação</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-02</td><td>Permitir consultar os espaços comuns disponíveis</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-03</td><td>Permitir visualizar a disponibilidade de um espaço por data e horário</td><td><span class="etq parcial">parcial</span></td></tr>
+    <tr><td>RF-04</td><td>Permitir solicitar uma reserva</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-05</td><td>Permitir ao morador consultar suas reservas</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-06</td><td>Permitir cancelamento quando as regras forem atendidas</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-07</td><td>Administrador pode aprovar ou recusar solicitações</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-08</td><td>Administrador pode cadastrar, alterar e inativar moradores</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-09</td><td>Administrador pode cadastrar e alterar espaços</td><td><span class="etq ok">implementado</span></td></tr>
+    <tr><td>RF-10</td><td>Manter histórico das reservas</td><td><span class="etq ok">implementado</span></td></tr>
+  </tbody>
+</table>
+
+<div class="caixa aviso">
+  <div class="caixa-titulo">Ressalvas de cobertura</div>
+  <ul>
+    <li><strong>RF-03</strong> — não existe tela dedicada de consulta de disponibilidade. <code>SpacesPage</code> exibe
+    a ficha do espaço e <code>ReservarEspacoPage</code> bloqueia conflitos <em>no ato da reserva</em>.
+    <code>calendar_page.dart</code> faria isso, mas é órfão e persiste apenas em <code>SharedPreferences</code>.</li>
+    <li><strong>RF-09</strong> — <code>SpaceService.deleteSpace</code> existe, mas o botão de exclusão foi removido da
+    interface (comentário <code>// Removendo o botão de exclusão</code>).</li>
+    <li><strong>RF-10</strong> — há inventário por período em <code>DashboardRelatorioPage</code>, mas
+    <strong>não há trilha de auditoria</strong> de quem alterou o quê.</li>
+  </ul>
+</div>
+
+<h2 id="requisitos-nao-funcionais">Requisitos não funcionais</h2>
+
+<table>
+  <thead><tr><th>ID</th><th>Descrição</th><th>Cobertura</th></tr></thead>
+  <tbody>
+    <tr><td>RNF-01</td><td>Acesso às funcionalidades administrativas protegido por autenticação</td><td><span class="etq parcial">apenas cliente</span></td></tr>
+    <tr><td>RNF-02</td><td>Controle de acesso conforme o perfil do usuário</td><td><span class="etq parcial">apenas cliente</span></td></tr>
+    <tr><td>RNF-03</td><td>Interface de fácil utilização para moradores e administradores</td><td><span class="etq ok">atendido</span></td></tr>
+    <tr><td>RNF-04</td><td>Consultas de disponibilidade com resposta adequada ao uso cotidiano</td><td><span class="etq ok">atendido</span></td></tr>
+    <tr><td>RNF-05</td><td>Dados das reservas armazenados de forma consistente</td><td><span class="etq parcial">parcial</span></td></tr>
+    <tr><td>RNF-06</td><td>Mecanismo de backup dos dados</td><td><span class="etq falta">ausente</span></td></tr>
+  </tbody>
+</table>
+
+<p><strong>RNF-05</strong> é parcialmente atendido: há <code>runTransaction</code> no cancelamento e <code>batch</code> em
+notificações e interdição, mas a criação de reserva não é transacional. <strong>RNF-06</strong> não possui qualquer
+código ou configuração correspondente no repositório.</p>
+
+<h2 id="requisitos-implicitos">Requisitos implícitos inferidos do código</h2>
+
+<table>
+  <thead><tr><th>Requisito implícito</th><th>Evidência</th></tr></thead>
+  <tbody>
+    <tr><td>Persistência de sessão entre execuções</td><td><code>AuthService.loadUserFromPreferences</code></td></tr>
+    <tr><td>Operação offline degradada</td><td><em>Fallback</em> de <code>SharedPreferences</code> em <code>AuthService</code> e <code>UserService</code></td></tr>
+    <tr><td>Feedback visual de carregamento</td><td><code>CircularProgressIndicator</code> em todos os <code>FutureBuilder</code>/<code>StreamBuilder</code></td></tr>
+    <tr><td>Confirmação antes de operações destrutivas</td><td>Diálogos em <code>MinhasReservasPage</code>, <code>UserCrudPage</code>, <code>SpacesPage</code>, <code>CalendarPage</code></td></tr>
+    <tr><td>Notificação ao morador em decisões</td><td><code>NotificationService.enviarNotificacao</code> em aprovação/recusa</td></tr>
+    <tr><td>Tolerância a dados legados</td><td><code>User.fromMap</code> aceita <code>login</code> ou <code>username</code>; <code>_isAvailable</code> aceita <code>String</code> ou <code>bool</code></td></tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ===================== SEGURANÇA ===================== -->
+<section id="seguranca">
+<h2 id="seguranca-privacidade">Segurança e privacidade</h2>
+
+<div class="caixa critico">
+  <div class="caixa-titulo">Achados críticos — nenhuma alteração de código foi realizada</div>
+  <p>Esta seção documenta riscos observados. Não há correção aplicada nesta entrega, conforme a restrição de atuar
+  somente sobre comentários.</p>
+</div>
+
+<table>
+  <thead><tr><th>Aspecto</th><th>Situação observada</th><th>Risco</th></tr></thead>
+  <tbody>
+    <tr>
+      <td>Armazenamento de senha</td>
+      <td>Campo <code>senha</code> em <strong>texto plano</strong> em <code>users</code></td>
+      <td><span class="etq falta">alto</span></td>
+    </tr>
+    <tr>
+      <td>Transporte de credencial</td>
+      <td>Comparação direta no cliente após ler o documento</td>
+      <td><span class="etq falta">alto</span></td>
+    </tr>
+    <tr>
+      <td>Regras Firestore</td>
+      <td><code>allow read, write: if true</code> em <code>users</code>, <code>espacos</code>, <code>notificacoes</code></td>
+      <td><span class="etq falta">alto</span></td>
+    </tr>
+    <tr>
+      <td>Autorização por perfil</td>
+      <td>Apenas verificações de <code>role</code> no cliente</td>
+      <td><span class="etq falta">alto</span></td>
+    </tr>
+    <tr>
+      <td>Validação de regras de negócio</td>
+      <td>Somente no cliente (exceto RD-06)</td>
+      <td><span class="etq parcial">médio</span></td>
+    </tr>
+    <tr>
+      <td>Sessão local</td>
+      <td><code>SharedPreferences</code> sem criptografia</td>
+      <td><span class="etq parcial">médio</span></td>
+    </tr>
+    <tr>
+      <td>Dados pessoais</td>
+      <td>CPF, e-mail, telefone e apartamento em <code>users</code>, sem controle de acesso</td>
+      <td><span class="etq falta">alto</span></td>
+    </tr>
+  </tbody>
+</table>
+
+<h3 id="regras-firestore">Regras do Firestore</h3>
+
+<pre><code>match /reservas/{reservaId} {
+  allow create: if unidadeValida(request.resource.data);
+  allow update: if unidadeValida(request.resource.data);
+  allow read, delete: if true;
+}
+match /users/{userId}      { allow read, write: if true; }
+match /espacos/{espacoId}  { allow read, write: if true; }
+match /notificacoes/{id}   { allow read, write: if true; }</code></pre>
+
+<p><code>unidadeValida</code> exige <code>id_unidade</code> presente, do tipo <code>string</code> e não vazio. É a
+<strong>única</strong> validação efetivamente aplicada no servidor. O próprio arquivo justifica a decisão:
+<em>«O aplicativo usa autenticação própria com SharedPreferences, sem Firebase Auth.»</em></p>
+
+<p><strong>Consequência:</strong> qualquer cliente portador da <code>apiKey</code> pode ler e escrever
+<code>users</code> — inclusive <code>senha</code> —, <code>espacos</code> e <code>notificacoes</code>.</p>
+
+<h3 id="recomendacoes">Recomendações registradas</h3>
+
+<ul>
+  <li>Adotar Firebase Authentication e substituir o campo <code>senha</code>.</li>
+  <li>Reescrever <code>firestore.rules</code> com autorização baseada em <code>request.auth</code> e no papel do usuário.</li>
+  <li>Mover validação de RD-01/RD-02/RD-03 para transação server-side ou Cloud Functions.</li>
+  <li>Implementar backup automático (RNF-06); o Firestore oferece exportação gerenciada.</li>
+</ul>
+
+<p><span class="etq parcial">⚠️ Não determinado</span> Se essas medidas estão planejadas.</p>
+</section>
+
+<!-- ===================== NAVEGAÇÃO ===================== -->
+<section id="navegacao">
+<h2 id="fluxo-navegacao">Fluxo de navegação</h2>
+
+<p>A navegação é imperativa (<code>Navigator.push</code> + <code>MaterialPageRoute</code>). O <code>Drawer</code> de
+<code>MyHomePage</code> monta os itens condicionalmente por <code>role</code>.</p>
+
+<figure>
+<div class="figura">
+<svg viewBox="0 0 840 430" role="img" aria-labelledby="svg-nav-titulo svg-nav-desc" xmlns="http://www.w3.org/2000/svg">
+  <title id="svg-nav-titulo">Mapa de navegação por perfil de usuário</title>
+  <desc id="svg-nav-desc">Login leva a MyHomePage. A partir dela, moradores acessam Espaços, Minhas Reservas, Reservar Espaço e Notificações. Administradores acessam Espaços, Gerenciar Usuários, Reservas, Análise de Reservas e Relatório. Ambos acessam Sobre e Sair.</desc>
+  <defs>
+    <marker id="seta4" markerWidth="9" markerHeight="9" refX="7" refY="3" orient="auto">
+      <path d="M0,0 L0,6 L7,3 z" fill="#8b93a1"/>
+    </marker>
+  </defs>
+
+  <!-- Login -->
+  <rect x="330" y="12" width="180" height="44" rx="8" fill="#f6f7f9" stroke="#c9ced6" stroke-width="1.4"/>
+  <text x="420" y="33" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="11.5" font-weight="700" fill="#16181d">LoginPage</text>
+  <text x="420" y="47" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#5c6472">AuthService.login</text>
+
+  <line x1="420" y1="56" x2="420" y2="82" stroke="#8b93a1" stroke-width="1.4" marker-end="url(#seta4)"/>
+
+  <!-- MyHomePage -->
+  <rect x="300" y="86" width="240" height="52" rx="8" fill="#eef0fb" stroke="#3949ab" stroke-width="1.8"/>
+  <text x="420" y="108" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="12" font-weight="700" fill="#2a3680">MyHomePage</text>
+  <text x="420" y="124" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="9" fill="#5c6472">drawer + saudação + cards + sino</text>
+
+  <!-- coluna user -->
+  <text x="120" y="176" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10.5" font-weight="700" fill="#1b7f4b">role = 'user'</text>
+  <line x1="330" y1="138" x2="150" y2="186" stroke="#8b93a1" stroke-width="1.3" marker-end="url(#seta4)"/>
+  <rect x="20" y="192" width="200" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="120" y="213" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">SpacesPage</text>
+  <rect x="20" y="234" width="200" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="120" y="255" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">MinhasReservasPage</text>
+  <rect x="20" y="276" width="200" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="120" y="297" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">AllReservasUserPage</text>
+  <rect x="20" y="318" width="200" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="120" y="339" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">NotificationsPage</text>
+
+  <line x1="120" y1="352" x2="120" y2="378" stroke="#8b93a1" stroke-width="1.2" marker-end="url(#seta4)"/>
+  <rect x="20" y="380" width="200" height="30" rx="6" fill="#eef0fb" stroke="#c9ced6"/>
+  <text x="120" y="399" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9.5">ReservarEspacoPage (FAB)</text>
+
+  <!-- coluna admin -->
+  <text x="700" y="176" text-anchor="middle" font-family="-apple-system,Segoe UI,Roboto,sans-serif" font-size="10.5" font-weight="700" fill="#2a3680">role = 'admin'</text>
+  <line x1="510" y1="138" x2="690" y2="186" stroke="#8b93a1" stroke-width="1.3" marker-end="url(#seta4)"/>
+  <rect x="600" y="192" width="220" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="710" y="213" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">SpacesPage (CRUD)</text>
+  <rect x="600" y="234" width="220" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="710" y="255" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">UserCrudPage</text>
+  <rect x="600" y="276" width="220" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="710" y="297" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">ReservasAdminPage</text>
+  <rect x="600" y="318" width="220" height="34" rx="6" fill="#fff" stroke="#c9ced6"/>
+  <text x="710" y="339" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5">AnalisePage</text>
+
+  <line x1="710" y1="352" x2="710" y2="378" stroke="#8b93a1" stroke-width="1.2" marker-end="url(#seta4)"/>
+  <rect x="600" y="380" width="220" height="30" rx="6" fill="#eef0fb" stroke="#c9ced6"/>
+  <text x="710" y="399" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="9.5">DashboardRelatorioPage (FAB)</text>
+
+  <!-- comum -->
+  <rect x="280" y="192" width="280" height="34" rx="6" fill="#f6f7f9" stroke="#c9ced6" stroke-dasharray="5 3"/>
+  <text x="420" y="213" text-anchor="middle" font-family="ui-monospace,Menlo,monospace" font-size="10.5" fill="#5c6472">DocumentacaoPage («Sobre») + Sair</text>
+</svg>
+</div>
+<figcaption>Figura 4 — Rotas acessíveis por perfil. Itens tracejados são comuns aos dois papéis.</figcaption>
+</figure>
+</section>
+
+<!-- ===================== REFERÊNCIA DE CÓDIGO ===================== -->
+<section id="referencia">
+<h2 id="referencia-codigo">Referência técnica do código</h2>
+
+<p>Documentação por arquivo, derivada do código-fonte. As assinaturas refletem exatamente as declarações existentes.
+Os blocos recolhíveis (<code>&lt;details&gt;</code>) podem ser expandidos individualmente; na impressão todos aparecem
+abertos.</p>
+
+<div class="caixa info">
+  <div class="caixa-titulo">Notação</div>
+  <p><code>Tipo metodo(params)</code> indica a assinatura real. <span class="etq">Future</span> indica operação
+  assíncrona; <span class="etq">Stream</span> indica fonte reativa. Métodos marcados com <span class="etq">sem consumidor</span>
+  existem no código mas não são chamados por nenhuma página roteada.</p>
+</div>
+
+<h2 id="ref-main">Núcleo — <code>lib/main.dart</code></h2>
+
+<p>Ponto de entrada da aplicação. Inicializa o Firebase, restaura a sessão, e provê o <em>shell</em> de navegação
+(barra superior, drawer por perfil, corpo com saudação e cards de acesso rápido).</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">Future&lt;void&gt; main()</span></summary>
+  <div class="corpo">
+    <p>Entrypoint assíncrono. Executa, nesta ordem:</p>
+    <ol>
+      <li><code>WidgetsFlutterBinding.ensureInitialized()</code> — garante bindings antes de plugins.</li>
+      <li><code>Firebase.initializeApp(options: DefaultFirebaseOptions.currentPlatform)</code>.</li>
+      <li>Instancia <code>AuthService</code> e chama <code>loadUserFromPreferences()</code> — revalida a sessão em cache
+      contra o Firestore, limpando-a se o usuário estiver desabilitado.</li>
+      <li>Instancia <code>UserService</code> (dispara <code>_load()</code> no construtor).</li>
+      <li><code>runApp(MyApp(...))</code>.</li>
+    </ol>
+    <p class="etq parcial">Efeito colateral</p>
+    <p>A sessão é restaurada <em>antes</em> do <code>runApp</code>, portanto a primeira renderização já reflete o estado
+    autenticado — não há tela de <em>splash</em>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class MyApp extends StatelessWidget</span><span class="tipo-retorno">Widget raiz</span></summary>
+  <div class="corpo">
+    <p>Constrói o <code>MaterialApp</code> com <code>title: 'Condomínio App'</code>,
+    <code>theme: ThemeData(primarySwatch: Colors.blue)</code> e <code>debugShowCheckedModeBanner: false</code>.</p>
+    <p>A propriedade <code>home</code> é um <code>AnimatedBuilder</code> sobre <code>authService</code>: reconstrói
+    automaticamente quando <code>notifyListeners()</code> é disparado por login ou logout.</p>
+    <table>
+      <thead><tr><th>Condição</th><th>Widget renderizado</th></tr></thead>
+      <tbody>
+        <tr><td><code>authService.isAuthenticated</code></td><td><code>MyHomePage</code></td></tr>
+        <tr><td>caso contrário</td><td><code>LoginPage</code></td></tr>
+      </tbody>
+    </table>
+    <p><strong>Parâmetros:</strong> <code>authService</code> (<code>AuthService</code>),
+    <code>userService</code> (<code>UserService</code>).</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class MyHomePage extends StatefulWidget</span><span class="tipo-retorno">Scaffold principal</span></summary>
+  <div class="corpo">
+    <p>Shell autenticado. Recebe <code>title</code>, <code>authService</code> e <code>userService</code>.</p>
+    <p>O estado <code>_MyHomePageState</code> expõe três <em>getters</em> que criam serviços sob demanda a cada acesso:</p>
+    <pre><code>SpaceService get _spaceService =&gt; SpaceService();
+ReservasService get _reservasService =&gt; ReservasService();
+AuthService get _authService =&gt; AuthService();</code></pre>
+    <p class="etq parcial">Observação</p>
+    <p>Esses <em>getters</em> instanciam novas cópias a cada chamada — <code>_authService</code> em particular retorna
+    uma instância <strong>diferente</strong> daquela usada pelo <code>AnimatedBuilder</code> raiz, e não é consumida em
+    nenhum ponto do <em>build</em>.</p>
+
+    <h4>Estruturas do build</h4>
+    <table>
+      <thead><tr><th>Elemento</th><th>Comportamento</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>AppBar</code> + sino</td>
+          <td><code>StreamBuilder&lt;QuerySnapshot&gt;</code> em <code>notificacoes</code> filtrando
+          <code>destinatario_id == currentUserId</code> e <code>lida == false</code>. Exibe <em>badge</em> vermelho com a
+          contagem quando &gt; 0. Tocar navega para <code>NotificationsPage</code>.</td>
+        </tr>
+        <tr>
+          <td><code>Drawer</code></td>
+          <td>Cabeçalho com gradiente índigo/azul e ícone <code>Icons.apartment</code>. Lista de navegação montada
+          condicionalmente por <code>role</code>.</td>
+        </tr>
+        <tr>
+          <td>Card de boas-vindas</td>
+          <td><code>FutureBuilder&lt;DocumentSnapshot&gt;</code> em <code>users/{currentUserId}</code> para obter o campo
+          <code>nome</code>. Exibe «Bem-vindo, <em>nome</em>! 👋» e o papel traduzido.</td>
+        </tr>
+        <tr>
+          <td>Cards de acesso rápido</td>
+          <td>Para <code>admin</code>: «Gerenciar Espaços» e «Análise de Reservas». Para <code>user</code>: «Minhas
+          Reservas».</td>
+        </tr>
+        <tr>
+          <td><code>FloatingActionButton.extended</code></td>
+          <td>Apenas para <code>admin</code>, rotulado «Relatório», navega para <code>DashboardRelatorioPage</code>.</td>
+        </tr>
+      </tbody>
+    </table>
+
+    <h4>Itens do drawer por perfil</h4>
+    <table>
+      <thead><tr><th>Item</th><th>user</th><th>admin</th><th>Destino</th></tr></thead>
+      <tbody>
+        <tr><td>Espaços</td><td>✅</td><td>✅</td><td><code>SpacesPage(isAdmin: role == 'admin')</code></td></tr>
+        <tr><td>Gerenciar Usuários</td><td>—</td><td>✅</td><td><code>UserCrudPage</code></td></tr>
+        <tr><td>Reservas</td><td>✅</td><td>✅</td><td><code>MinhasReservasPage</code> / <code>ReservasAdminPage</code></td></tr>
+        <tr><td>Análise de Reservas</td><td>—</td><td>✅</td><td><code>AnalisePage</code></td></tr>
+        <tr><td>Reservar Espaço</td><td>✅</td><td>—</td><td><code>AllReservasUserPage</code></td></tr>
+        <tr><td>Sobre</td><td>✅</td><td>✅</td><td><code>DocumentacaoPage</code></td></tr>
+        <tr><td>Relatório</td><td>—</td><td>✅</td><td><code>DashboardRelatorioPage</code></td></tr>
+        <tr><td>Sair</td><td>✅</td><td>✅</td><td><code>authService.logout()</code> + <code>Navigator.pop</code></td></tr>
+      </tbody>
+    </table>
+    <p class="etq parcial">Inconsistência verificada</p>
+    <p>A verificação do papel alterna entre <code>role == 'admin'</code> e <code>role.toLowerCase() == 'admin'</code>
+    no mesmo arquivo. Se o Firestore armazenar <code>'Admin'</code> ou <code>'ADMIN'</code>, alguns itens aparecem e
+    outros não.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Widget _buildReportRow(String label, String value, Color color)</span></summary>
+  <div class="corpo">
+    <p>Função de nível superior que monta uma linha de relatório: <code>Container</code> com fundo
+    <code>Colors.white10</code>, borda esquerda colorida de 4 px, cantos arredondados, <code>label</code> à esquerda e
+    <code>value</code> em destaque à direita.</p>
+    <p class="etq parcial">Sem consumidor</p>
+    <p>Nenhum arquivo importa ou invoca esta função. É código morto dentro de um arquivo ativo.</p>
+  </div>
+</details>
+</section>
+
+<!-- ===== MODELOS ===== -->
+<section id="ref-modelos">
+<h2 id="ref-user-model">Modelo — <code>lib/models/user.dart</code></h2>
+
+<p>Representação de usuário com mapeamento bidirecional para documentos do Firestore. Mantém campos conhecidos como
+propriedades explícitas e agrupa o restante em <code>extra</code>.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class User</span><span class="tipo-retorno">modelo de domínio</span></summary>
+  <div class="corpo">
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td><code>username</code></td><td><code>String</code></td><td>Identificador de login; corresponde ao campo <code>login</code> no Firestore</td></tr>
+        <tr><td><code>role</code></td><td><code>String</code></td><td><code>'admin'</code> ou <code>'user'</code></td></tr>
+        <tr><td><code>ind_habilitado</code></td><td><code>String</code></td><td><code>'S'</code> habilitado / <code>'N'</code> desabilitado; default <code>'S'</code></td></tr>
+        <tr><td><code>extra</code></td><td><code>Map&lt;String, dynamic&gt;?</code></td><td>Campos adicionais: <code>nome</code>, <code>cpf</code>, <code>email</code>, <code>telefone</code>, <code>id_apartamento</code>, <code>data_cadastro</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">factory User.fromMap(String id, Map&lt;String, dynamic&gt; data)</span><span class="tipo-retorno">User</span></summary>
+  <div class="corpo">
+    <p>Constrói um <code>User</code> a partir de um documento. Resolve o login com tolerância a dados legados:</p>
+    <pre><code>final login = (data['login'] ?? data['username'] ?? id) as String;</code></pre>
+    <p>Lê <code>role</code> com default <code>'user'</code> e <code>ind_habilitado</code> com default <code>'S'</code>.
+    Em seguida copia o mapa para <code>extras</code> e remove as chaves conhecidas
+    (<code>login</code>, <code>username</code>, <code>role</code>, <code>ind_habilitado</code>, <code>senha</code>),
+    de modo que <code>extra</code> contenha apenas campos não modelados.</p>
+    <p><strong>Parâmetros:</strong> <code>id</code> — ID do documento (usado como último recurso para o login);
+    <code>data</code> — mapa do documento.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Map&lt;String, dynamic&gt; toMap({String? senha})</span><span class="tipo-retorno">mapa para gravação</span></summary>
+  <div class="corpo">
+    <p>Serializa o modelo para gravação. Sempre inclui <code>login</code>, <code>role</code> e
+    <code>ind_habilitado</code>. O campo <code>senha</code> só é incluído quando fornecido explicitamente como argumento —
+    padrão usado por <code>UserService.updateUser</code> para <em>preservar</em> a senha existente em renomeações.</p>
+    <p>As entradas de <code>extra</code>, quando presentes, são mescladas no mapa final.</p>
+    <p class="etq parcial">Atenção</p>
+    <p>Como <code>extra</code> é mesclado <em>após</em> as chaves fixas, uma entrada homônima em <code>extra</code>
+    sobrescreveria <code>login</code>, <code>role</code> ou <code>ind_habilitado</code>.</p>
+  </div>
+</details>
+
+<div class="caixa critico">
+  <div class="caixa-titulo">Classe <code>User</code> duplicada</div>
+  <p>Existe uma <strong>segunda</strong> classe <code>User</code>, declarada em
+  <code>lib/services/auth_service.dart</code>, sem o campo <code>extra</code> e sem os métodos de mapeamento. As duas são
+  tipos distintos e incompatíveis em tempo de compilação. <code>AuthService.currentUser</code> é do tipo da versão em
+  <code>auth_service.dart</code>, enquanto <code>UserService</code> e <code>UserCrudPage</code> usam a de
+  <code>models/user.dart</code>.</p>
+</div>
+</section>
+
+<!-- ===== SERVIÇOS ===== -->
+<section id="ref-servicos">
+<h2 id="ref-services">Camada de serviços</h2>
+
+<p>Sete classes de serviço, uma por responsabilidade. Nenhuma é injetada: cada página instancia a sua diretamente.</p>
+
+<h3 id="ref-auth-service"><code>lib/services/auth_service.dart</code></h3>
+
+<p>Autenticação, sessão e revalidação de habilitação. Estende <code>ChangeNotifier</code> para notificar a árvore de
+widgets sobre mudanças de sessão.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class AuthService extends ChangeNotifier</span><span class="tipo-retorno">serviço</span></summary>
+  <div class="corpo">
+    <table>
+      <thead><tr><th>Membro</th><th>Tipo</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td><code>_currentUser</code></td><td><code>User?</code></td><td>usuário autenticado em memória</td></tr>
+        <tr><td><code>currentUser</code></td><td><code>User? get</code></td><td>acessor ao usuário atual</td></tr>
+        <tr><td><code>isAuthenticated</code></td><td><code>bool get</code></td><td><code>_currentUser != null</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; login(String username, String password)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Autentica contra a coleção <code>users</code>. Sequência:</p>
+    <ol>
+      <li>Query <code>where('login', isEqualTo: username).limit(1)</code>.</li>
+      <li>Se vazio → <code>Exception('Usuário não encontrado')</code>.</li>
+      <li>Lê <code>ind_habilitado</code> (default <code>'S'</code>); se diferente de <code>'S'</code> →
+      <code>Exception('Usuário inválido')</code>.</li>
+      <li>Compara <code>userData['senha']</code> com <code>password</code>; se diferente →
+      <code>Exception('Senha incorreta')</code>.</li>
+      <li>Cria <code>_currentUser</code> e persiste <code>username</code>, <code>role</code> e
+      <code>ind_habilitado</code> em <code>SharedPreferences</code>.</li>
+      <li><code>notifyListeners()</code>.</li>
+    </ol>
+    <p class="etq falta">Comparação em texto plano</p>
+    <p>A senha é comparada diretamente contra o valor armazenado. Não há hash, salt ou Firebase Authentication.</p>
+    <p class="etq parcial">Encapsulamento de exceção</p>
+    <p>O bloco <code>catch</code> relança como <code>Exception('Erro ao autenticar: $e')</code>, o que faz a mensagem
+    original aparecer aninhada. Como <code>LoginPage</code> ignora o texto e exibe mensagem genérica, o detalhe não chega
+    ao usuário.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;User&gt; verifyCredentials(String username, String password)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Valida credenciais <strong>sem alterar a sessão</strong> e devolve o <code>User</code> correspondente. Aplica as
+    mesmas três verificações de <code>login()</code> (existência, habilitação, senha), mas não grava em
+    <code>SharedPreferences</code> nem dispara <code>notifyListeners()</code>.</p>
+    <p><strong>Consumidor:</strong> <code>CalendarPage._addBooking</code> — a página órfã —, que exige nova confirmação de
+    identidade para criar um agendamento.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; logout()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Define <code>_currentUser = null</code>, executa <code>prefs.clear()</code> (limpa <strong>todas</strong> as chaves
+    do <code>SharedPreferences</code>, incluindo o cache <code>users_list</code> de <code>UserService</code>) e chama
+    <code>notifyListeners()</code>.</p>
+    <p class="etq parcial">Efeito colateral</p>
+    <p>Como <code>UserService._load()</code> lê <code>users_list</code> na construção, após um logout o próximo
+    <code>UserService</code> encontrará o cache vazio e o recriará a partir do Firestore.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; loadUserFromPreferences()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Restaura a sessão na inicialização e a revalida contra o servidor.</p>
+    <ol>
+      <li>Lê <code>username</code>, <code>role</code> e <code>ind_habilitado</code> do cache.</li>
+      <li>Sem <code>username</code>/<code>role</code> → <code>_currentUser = null</code>, encerra.</li>
+      <li>Reconsulta <code>users</code> por <code>login</code>.</li>
+      <li>Se o documento indicar <code>ind_habilitado != 'S'</code> → limpa cache, anula sessão, notifica e encerra.</li>
+      <li>Se a consulta lançar exceção (ex.: offline) → <strong>mantém a sessão do cache</strong> e prossegue.</li>
+      <li>Cria <code>_currentUser</code> e notifica.</li>
+    </ol>
+    <p class="etq ok">Comportamento offline intencional</p>
+    <p>O <em>fallback</em> está documentado no próprio código: em erro de consulta, a sessão local é preservada. Um
+    usuário desabilitado enquanto offline só será desconectado quando a rede retornar.</p>
+  </div>
+</details>
+
+<h3 id="ref-user-service"><code>lib/services/user_service.dart</code></h3>
+
+<p>CRUD de usuários com estratégia <em>cache-aside</em>: tenta o Firestore, cai para <code>SharedPreferences</code> em
+caso de falha ou ausência de dados. Estende <code>ChangeNotifier</code> e expõe a lista como não modificável.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class UserService extends ChangeNotifier</span><span class="tipo-retorno">serviço</span></summary>
+  <div class="corpo">
+    <table>
+      <thead><tr><th>Membro</th><th>Tipo</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td><code>_kUsersKey</code></td><td><code>static const String</code></td><td>chave de cache <code>'users_list'</code></td></tr>
+        <tr><td><code>_users</code></td><td><code>List&lt;User&gt;</code></td><td>lista em memória</td></tr>
+        <tr><td><code>users</code></td><td><code>List&lt;User&gt; get</code></td><td><code>List.unmodifiable(_users)</code></td></tr>
+        <tr><td><code>UserService()</code></td><td>construtor</td><td>dispara <code>_load()</code> de forma não aguardada</td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _load()</span><span class="tipo-retorno">privado</span></summary>
+  <div class="corpo">
+    <p>Carrega a lista com três estratégias em cascata:</p>
+    <ol>
+      <li><strong>Firestore</strong> — <code>collection('users').get()</code>; se houver documentos, mapeia com
+      <code>User.fromMap(doc.id, doc.data())</code>, regrava o cache via <code>_save()</code>, notifica e encerra.</li>
+      <li><strong>Cache local</strong> — se o Firestore falhar ou vier vazio, decodifica <code>users_list</code> como JSON,
+      remontando o <code>extra</code> sem as chaves estruturais.</li>
+      <li><strong>Semente</strong> — se não houver cache, cria <code>[User('admin','admin','S')]</code> e persiste.</li>
+    </ol>
+    <p class="etq parcial">Atenção</p>
+    <p>A semente cria um usuário <code>admin</code> <strong>apenas no cache local</strong>, sem senha e sem gravar no
+    Firestore. Ele não é autenticável por <code>AuthService.login</code>, que consulta exclusivamente o Firestore.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _save()</span><span class="tipo-retorno">privado</span></summary>
+  <div class="corpo">
+    <p>Serializa <code>_users</code> para JSON e grava em <code>SharedPreferences</code>, sob a chave
+    <code>users_list</code>. Converte <code>Timestamp</code> e <code>DateTime</code> para ISO-8601 antes da codificação,
+    pois JSON não representa esses tipos nativamente.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;List&lt;User&gt;&gt; getUsers()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Retorna a lista, disparando <code>_load()</code> se estiver vazia. <span class="etq">sem consumidor</span>
+    Nenhuma página chama este método; <code>UserCrudPage</code> consome o <em>getter</em> <code>users</code> e
+    <code>loadUsers()</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; loadUsers()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Força recarga completa do Firestore. Usado por <code>UserCrudPage._reloadUsers</code> no
+    <code>addPostFrameCallback</code> do <code>initState</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; addUser(User user)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Rejeita duplicatas por <code>username</code> e então <strong>sempre lança</strong>:</p>
+    <pre><code>throw Exception('Use addUserWithPassword to create a user with password in Firestore');</code></pre>
+    <p>É um <em>guard-rail</em> deliberado: a criação de usuário exige senha, então este caminho é bloqueado.
+    <span class="etq">sem consumidor</span></p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; addUserWithPassword(String username, String password, String nome, String cpf, String email, String telefone, String idApartamento, String role)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Cria usuário com os campos padrão obrigatórios. Validações, na ordem:</p>
+    <table>
+      <thead><tr><th>Validação</th><th>Mensagem</th></tr></thead>
+      <tbody>
+        <tr><td><code>password.trim().isEmpty</code></td><td><code>'Senha é obrigatória'</code></td></tr>
+        <tr><td><code>username</code> duplicado em <code>_users</code></td><td><code>'Usuário já existe'</code></td></tr>
+        <tr><td><code>nome.trim().isEmpty</code></td><td><code>'Nome é obrigatório'</code></td></tr>
+        <tr><td><code>cpf.trim().isEmpty</code></td><td><code>'CPF é obrigatório'</code></td></tr>
+        <tr><td><code>int.tryParse(cpf) == null</code></td><td><code>'CPF deve ser numérico'</code></td></tr>
+        <tr><td><code>int.tryParse(idApartamento) == null</code></td><td><code>'ID Apartamento deve ser numérico'</code></td></tr>
+        <tr><td><code>id_apartamento</code> já usado</td><td><code>'Apartamento já cadastrado'</code></td></tr>
+      </tbody>
+    </table>
+    <p>Grava em <code>users/{username}</code> com <code>login</code>, <code>nome</code>, <code>cpf</code>,
+    <code>email</code>, <code>telefone</code>, <code>id_apartamento</code>, <code>role</code>, <code>senha</code>,
+    <code>ind_habilitado: 'S'</code> e <code>data_cadastro</code> (<code>Timestamp.now</code>). Em seguida atualiza o cache
+    e notifica.</p>
+    <p class="etq parcial">Atenção</p>
+    <p>A validação de CPF aqui exige apenas dígitos, mas <code>UserCrudPage</code> valida o formato mascarado
+    <code>000.000.000-00</code> e envia o valor sem máscara — os dois contratos não se contradizem, mas a regra de CPF
+    não considera dígitos verificadores.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; updateUser(String oldUsername, User updated)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Atualiza um usuário, com tratamento distinto para renomeação:</p>
+    <ul>
+      <li><strong>Username alterado</strong> — lê o documento antigo para recuperar <code>senha</code> e
+      <code>data_cadastro</code>; apaga o documento antigo; cria o novo com
+      <code>updated.toMap(senha: password)</code>, preservando <code>data_cadastro</code> (ou gerando novo
+      <code>Timestamp</code> se ausente).</li>
+      <li><strong>Username mantido</strong> — monta <code>updateMap</code> com <code>role</code> e
+      <code>ind_habilitado</code>; se <code>extra</code> contiver <code>id_apartamento</code>, verifica unicidade contra os
+      demais usuários; mescla as entradas de <code>extra</code>; executa <code>update()</code>.</li>
+    </ul>
+    <p>Ambos os caminhos lançam <code>'Falha ao atualizar usuário no Firestore: $e'</code> em erro. O cache só é
+    atualizado após sucesso no Firestore.</p>
+    <p class="etq parcial">Não atômico</p>
+    <p>A renomeação executa <code>delete()</code> seguido de <code>set()</code> sem transação. Uma falha entre as duas
+    operações deixa o usuário inexistente.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; deleteUser(String username)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p><em>Hard delete</em>: remove o documento de <code>users</code> e então remove da lista em memória, regrava o cache
+    e notifica. Lança <code>'Usuário não encontrado'</code> se o username não estiver na lista local e
+    <code>'Falha ao excluir usuário do Firestore: $e'</code> em erro remoto.</p>
+    <p class="etq parcial">Atenção</p>
+    <p>Reservas históricas do usuário permanecem em <code>reservas</code> com <code>id_morador</code> apontando para um
+    documento inexistente. As páginas que buscam o nome exibirão <code>'Desconhecido'</code> ou
+    <code>'Usuário não encontrado'</code>.</p>
+  </div>
+</details>
+
+<h3 id="ref-space-service"><code>lib/services/space_service.dart</code></h3>
+
+<p>CRUD de espaços comuns sobre a coleção <code>espacos</code>. O document ID é derivado do nome do espaço.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class SpaceService</span><span class="tipo-retorno">serviço</span></summary>
+  <div class="corpo">
+    <table>
+      <thead><tr><th>Membro</th><th>Tipo</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td><code>_firestore</code></td><td><code>FirebaseFirestore</code></td><td>instância do Firestore</td></tr>
+        <tr><td><code>_col</code></td><td><code>CollectionReference</code></td><td>coleção <code>espacos</code></td></tr>
+        <tr><td><code>_sanitizeId(String)</code></td><td><code>String</code></td><td>aplica <code>trim</code> e troca <code>[\\/]+</code> por <code>'-'</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;List&lt;Map&lt;String, dynamic&gt;&gt;&gt; getSpaces()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Lê todos os documentos de <code>espacos</code> e injeta <code>data['id'] = doc.id</code> em cada mapa. O campo
+    <code>id</code> <strong>não é persistido</strong>: existe apenas no retorno, para que a UI possa referenciar o
+    documento em edições. Erros são relançados sem tratamento.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;String&gt; createSpace(Map&lt;String, dynamic&gt; space)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Cria um espaço e devolve o ID gerado.</p>
+    <ol>
+      <li>Exige <code>nome</code> não vazio → <code>'Nome é obrigatório'</code>.</li>
+      <li>Deriva <code>docId = _sanitizeId(rawName)</code>.</li>
+      <li>Se o documento já existir → <code>'Já existe um espaço com o nome "..."'</code>.</li>
+      <li>Garante <code>payload['nome'] = rawName</code> e executa <code>set</code>.</li>
+    </ol>
+    <p>Erros são encapsulados como <code>'Falha ao criar espaço: $e'</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; updateSpace(String id, Map&lt;String, dynamic&gt; data)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Atualiza um espaço. Se <code>data['nome']</code> produzir um ID sanitizado diferente de <code>id</code>, a operação
+    vira <strong>renomeação</strong>:</p>
+    <ol>
+      <li>Verifica se o documento de destino já existe → erro se sim.</li>
+      <li>Cria o novo documento com o payload.</li>
+      <li>Apaga o documento antigo.</li>
+    </ol>
+    <p>Caso contrário executa <code>update(data)</code> no mesmo documento.</p>
+    <p class="etq parcial">Consequência da renomeação</p>
+    <p><code>reservas.espaco</code> guarda o <strong>nome</strong> do espaço. Renomear cria um novo documento mas
+    <strong>não</strong> atualiza as reservas existentes, que passam a referenciar um nome inexistente.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; deleteSpace(String id)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p><em>Hard delete</em> do documento. Erros viram <code>'Falha ao remover espaço: $e'</code>.</p>
+    <p><span class="etq">sem consumidor na UI</span> O botão de exclusão foi removido de <code>SpacesPage</code>
+    (comentário <code>// Removendo o botão de exclusão</code>). O método permanece disponível, mas nenhuma página o
+    invoca.</p>
+  </div>
+</details>
+
+<h3 id="ref-reservas-service"><code>lib/services/reservas_service.dart</code></h3>
+
+<p>Regras de reserva transacionais e de cancelamento. Dos quatro métodos, apenas <code>cancelarReserva</code> é
+efetivamente consumido pela interface.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class ReservasService</span><span class="tipo-retorno">serviço</span></summary>
+  <div class="corpo">
+    <p>Expõe <code>reservasCollection</code> (<code>CollectionReference&lt;Map&lt;String, dynamic&gt;&gt;</code> sobre
+    <code>reservas</code>).</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; criarReserva(Map&lt;String, dynamic&gt; reservaData)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Valida <code>id_unidade</code> não vazio, verifica duplicidade por <code>espaco</code> + <code>data_reserva</code> e
+    grava com <code>status: 'PENDENTE'</code> e <code>data_criacao: serverTimestamp()</code>.</p>
+    <p class="etq falta">Divergência de ID</p>
+    <p>A gravação usa o <strong>nome do espaço como ID do documento</strong>:</p>
+    <pre><code>await reservasCollection.doc(nomeEspaco).set(novaReserva);</code></pre>
+    <p>Isso conflita com a UI (<code>reservas_user_page</code>), que usa <code>.doc()</code> com ID automático. Como o ID é
+    o nome do espaço, só pode existir <strong>uma reserva por espaço em todo o histórico</strong>, pois cada
+    <code>set</code> sobrescreveria a anterior.</p>
+    <p><span class="etq">sem consumidor</span> Nenhuma página chama este método.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; aprovarOuRecusarReserva(String idReserva, String status)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Aceita apenas <code>'APROVADA'</code> ou <code>'RECUSADA'</code>; qualquer outro valor lança
+    <code>'Status inválido. Use APROVADA ou RECUSADA.'</code>. Em seguida executa
+    <code>update({'status': status})</code>.</p>
+    <div class="caixa critico">
+      <div class="caixa-titulo">Vocabulário incompatível com o restante do sistema</div>
+      <p>O resto da aplicação usa <code>ACEITA</code> e <code>REJEITADA</code>. Como esta é a única fonte que produz
+      <code>APROVADA</code>/<code>RECUSADA</code>, e nenhuma página lê esses valores, uma reserva aprovada por este
+      caminho ficaria invisível aos filtros e às cores de status.</p>
+      <p><span class="etq">sem consumidor</span> Não é chamado por nenhuma página.</p>
+    </div>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;String?&gt; cancelarReserva(String idReserva, String userId)</span><span class="tipo-retorno">assíncrono · consome transação</span></summary>
+  <div class="corpo">
+    <p>Método <strong>efetivamente usado</strong> pela aplicação (via <code>MinhasReservasPage._excluirReserva</code>).
+    Executa dentro de <code>runTransaction</code> e devolve <code>null</code> em sucesso ou uma mensagem de erro.</p>
+    <table>
+      <thead><tr><th>Verificação</th><th>Retorno</th></tr></thead>
+      <tbody>
+        <tr><td>Reserva inexistente</td><td><code>'Reserva não encontrada.'</code></td></tr>
+        <tr><td><code>id_morador != userId</code></td><td><code>'Você só pode cancelar suas próprias reservas.'</code></td></tr>
+        <tr><td><code>data_reserva</code> não é <code>Timestamp</code> ou <code>hora_inicio</code> inválido</td><td><code>'Data ou horário da reserva inválido.'</code></td></tr>
+        <tr><td>Menos de 24 h até o início <em>e</em> <code>status == 'ACEITA'</code></td><td>mensagem de prazo (constante <code>mensagemPrazo</code>)</td></tr>
+      </tbody>
+    </table>
+    <p>Em sucesso, grava <code>status: 'CANCELADA'</code> e <code>data_cancelamento: serverTimestamp()</code>.</p>
+    <p class="etq parcial">RD-05 parcial</p>
+    <p>A regra das 24 horas só é aplicada quando o status é <code>ACEITA</code>. Reservas <code>PENDENTE</code> são
+    canceláveis a qualquer momento. O código também chama <code>debugPrint</code> quando a mensagem de prazo é retornada,
+    mas o valor é devolvido ao chamador de qualquer forma.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; reagendarReserva(String idReserva, DateTime novaData, String horaInicio, String horaFim)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Carrega a reserva, obtém o <code>espaco</code>, verifica duplicidade de espaço+data <strong>excluindo o próprio
+    documento</strong> e atualiza <code>data_reserva</code>, <code>hora_inicio</code> e <code>hora_fim</code>.</p>
+    <p>Lanca <code>'Reserva não encontrada.'</code> ou <code>'O dia já foi reservado para este espaço.'</code>; erros são
+    encapsulados como <code>'Erro ao reagendar reserva: $e'</code>.</p>
+    <p><span class="etq">sem consumidor</span> A edição de reserva em <code>ReservasAdminPage._editarReserva</code> escreve
+    diretamente no Firestore e não utiliza este método.</p>
+  </div>
+</details>
+
+<h3 id="ref-notification-service"><code>lib/services/notification_service.dart</code></h3>
+
+<p>Envio e marcação de notificações na coleção <code>notificacoes</code>.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class NotificationService</span><span class="tipo-retorno">serviço</span></summary>
+  <div class="corpo">
+    <p><code>_notifCollection</code> referencia <code>notificacoes</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; enviarNotificacao({required String userId, required String titulo, required String mensagem, String tipo = 'aviso'})</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Adiciona um documento com <code>destinatario_id</code>, <code>titulo</code>, <code>mensagem</code>,
+    <code>lida: false</code>, <code>data_criacao: serverTimestamp()</code> e <code>tipo</code>.</p>
+    <p><strong>Tipos usados:</strong> <code>'aviso'</code> (default), <code>'reserva_aceita'</code>,
+    <code>'reserva_recusada'</code>, <code>'geral'</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; enviarNotificacaoGlobal({required String titulo, required String mensagem})</span><span class="tipo-retorno">assíncrono · batch</span></summary>
+  <div class="corpo">
+    <p>Lê todos os documentos de <code>users</code> e, em um único <code>WriteBatch</code>, cria uma notificação por
+    usuário com <code>destinatario_id = doc.id</code> e <code>tipo: 'geral'</code>.</p>
+    <p>O código justifica a abordagem: em aplicações de grande porte isso seria feito por Cloud Functions, mas para o
+    volume de um condomínio um laço simples é suficiente.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; marcarComoLida(String notifId)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p><code>update({'lida': true})</code> em um documento. Chamado ao tocar em uma notificação não lida.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; marcarTodasComoLidas(String userId)</span><span class="tipo-retorno">assíncrono · batch</span></summary>
+  <div class="corpo">
+    <p>Consulta <code>destinatario_id == userId</code> e <code>lida == false</code>, e aplica <code>lida: true</code> a
+    todos via <code>WriteBatch</code>. Ligado ao ícone <code>Icons.done_all</code> em <code>NotificationsPage</code>.</p>
+  </div>
+</details>
+
+<h3 id="ref-management-service"><code>lib/services/management_service.dart</code></h3>
+
+<details class="api" open>
+  <summary><span class="assinatura">class ManagementService</span><span class="tipo-retorno">serviço mínimo</span></summary>
+  <div class="corpo">
+    <table>
+      <thead><tr><th>Membro</th><th>Assinatura</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr>
+          <td><code>getReservas()</code></td>
+          <td><code>Future&lt;List&lt;Map&lt;String, dynamic&gt;&gt;&gt;</code></td>
+          <td>Lê todas as reservas e injeta <code>id: doc.id</code>. Erros viram <code>'Erro ao buscar reservas: $e'</code></td>
+        </tr>
+      </tbody>
+    </table>
+    <p><span class="etq">consumido apenas por página órfã</span> O único consumidor é
+    <code>ManagementPage._carregarReservas</code>, e <code>ManagementPage</code> não é alcançavel a partir de
+    <code>main.dart</code>. Sobreposição funcional com <code>ReservasService</code> e
+    <code>DashboardRelatorioService</code>.</p>
+  </div>
+</details>
+
+<h3 id="ref-dashboard-service"><code>lib/services/dashboard_relatorio_service.dart</code></h3>
+
+<p>Agregação de dados para o relatório de utilização.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class DashboardRelatorioService</span><span class="tipo-retorno">serviço</span></summary>
+  <div class="corpo">
+    <p><code>_firestore</code> — instância usada nas consultas.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;List&lt;Map&lt;String, dynamic&gt;&gt;&gt; fetchAllSpaces()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Lê <code>espacos</code> e injeta <code>id</code>. Em erro, registra <code>print</code> e retorna lista vazia —
+    diferente da maioria dos serviços, que relançam a exceção.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;List&lt;Map&lt;String, dynamic&gt;&gt;&gt; fetchAllReservations()</span><span class="tipo-retorno">assíncrono · N+1</span></summary>
+  <div class="corpo">
+    <p>Lê todas as reservas e, para cada uma com <code>id_morador</code>, busca o documento correspondente em
+    <code>users</code> para obter <code>nome</code>. Enriquece o mapa com:</p>
+    <table>
+      <thead><tr><th>Situação</th><th>Campos gravados</th></tr></thead>
+      <tbody>
+        <tr><td>Usuário encontrado</td><td><code>morador</code> e <code>nome_morador</code> = <code>nome</code></td></tr>
+        <tr><td>Usuário inexistente</td><td><code>morador = 'Usuário não encontrado'</code></td></tr>
+        <tr><td>Erro na consulta</td><td><code>morador = 'Erro na busca'</code></td></tr>
+        <tr><td>Sem <code>id_morador</code></td><td><code>morador = 'Não informado'</code> (se ausente)</td></tr>
+      </tbody>
+    </table>
+    <p>As consultas por usuário são disparadas em paralelo e reunidas com <code>Future.wait</code>.</p>
+    <p class="etq parcial">Padrão N+1</p>
+    <p>Há uma leitura de <code>users</code> por reserva. O próprio código de <code>ReservasAdminPage</code> repete a
+    mesma estratégia, sem cache compartilhado entre páginas.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Map&lt;String, dynamic&gt; calculateGeneralMetrics(List&lt;Map&gt; reservations, List&lt;Map&gt; spaces, DateTime startDate, DateTime endDate)</span><span class="tipo-retorno">mapa de métricas</span></summary>
+  <div class="corpo">
+    <p>Calcula métricas síncronas sobre a lista já carregada:</p>
+    <ol>
+      <li>Filtra reservas cujo <code>data_reserva</code> (como <code>Timestamp</code>) esteja entre
+      <code>startDate</code> e <code>endDate</code>, inclusive nas bordas.</li>
+      <li>Inicializa <code>reservationsPerSpace</code> com <strong>todos</strong> os espaços cadastrados em zero.</li>
+      <li>Conta reservas por <code>espaco</code>; nomes não cadastrados são adicionados à contagem.</li>
+      <li>Determina o espaço mais reservado; empate resolve para o primeiro encontrado na iteração.</li>
+    </ol>
+    <table>
+      <thead><tr><th>Chave retornada</th><th>Tipo</th><th>Significado</th></tr></thead>
+      <tbody>
+        <tr><td><code>filteredReservations</code></td><td><code>List</code></td><td>reservas dentro do período</td></tr>
+        <tr><td><code>reservationsPerSpace</code></td><td><code>Map&lt;String,int&gt;</code></td><td>contagem por nome de espaço</td></tr>
+        <tr><td><code>mostReservedSpace</code></td><td><code>String</code></td><td>espaço mais reservado, ou <code>'-'</code> se todos zero</td></tr>
+        <tr><td><code>totalReservations</code></td><td><code>int</code></td><td>tamanho da lista filtrada</td></tr>
+      </tbody>
+    </table>
+    <p class="etq parcial">Não considera status</p>
+    <p>O filtro ignora <code>status</code>: reservas <code>CANCELADA</code> e <code>REJEITADA</code> contam como
+    utilização.</p>
+  </div>
+</details>
+</section>
+
+<!-- ===== PÁGINAS ===== -->
+<section id="ref-paginas">
+<h2 id="ref-pages">Camada de apresentação — páginas</h2>
+
+<h3 id="ref-login-page"><code>lib/pages/login_page.dart</code></h3>
+
+<p>Tela de autenticação, renderizada por <code>MyApp</code> quando não há sessão ativa. <code>StatefulWidget</code> com
+<code>Form</code> e <code>GlobalKey&lt;FormState&gt;</code>.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class LoginPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetro:</strong> <code>authService</code> (<code>AuthService</code>, obrigatório).</p>
+    <p>Estado interno:</p>
+    <table>
+      <thead><tr><th>Campo</th><th>Tipo</th><th>Descrição</th></tr></thead>
+      <tbody>
+        <tr><td><code>_formKey</code></td><td><code>GlobalKey&lt;FormState&gt;</code></td><td>validação do formulário</td></tr>
+        <tr><td><code>_loginController</code></td><td><code>TextEditingController</code></td><td>campo «Login»</td></tr>
+        <tr><td><code>_passwordController</code></td><td><code>TextEditingController</code></td><td>campo «Senha»</td></tr>
+        <tr><td><code>_isLoading</code></td><td><code>bool</code></td><td>troca o botão por <code>CircularProgressIndicator</code></td></tr>
+        <tr><td><code>_isButtonEnabled</code></td><td><code>bool</code></td><td>habilita «Entrar» quando ambos os campos têm conteúdo</td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void initState()</span><span class="tipo-retorno">ciclo de vida</span></summary>
+  <div class="corpo">
+    <p>Registra <code>_updateButtonState</code> como <em>listener</em> de ambos os <code>TextEditingController</code>, de
+    modo que o botão reflita o preenchimento em tempo real.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _updateButtonState()</span><span class="tipo-retorno">callback</span></summary>
+  <div class="corpo">
+    <p><code>setState</code> definindo <code>_isButtonEnabled</code> como a conjunção de ambos os campos não vazios —
+    sem <code>trim</code>, portanto apenas espaços habilitam o botão.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _login()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Executa <code>_formKey.currentState!.validate()</code> e, se válido, ativa <code>_isLoading</code> e chama
+    <code>authService.login</code> com os textos <em>trimados</em>.</p>
+    <ul>
+      <li><strong>Sucesso</strong> — <code>SnackBar</code> verde «🎉 Login realizado com sucesso!». A navegação ocorre
+      indiretamente: <code>notifyListeners()</code> no serviço faz o <code>AnimatedBuilder</code> raiz trocar
+      <code>LoginPage</code> por <code>MyHomePage</code>.</li>
+      <li><strong>Erro</strong> — <code>SnackBar</code> vermelho «❌ Login ou Senha inválidos».</li>
+      <li><strong>Sempre</strong> — <code>_isLoading = false</code> no <code>finally</code>, com proteção
+      <code>if (mounted)</code>.</li>
+    </ul>
+    <div class="caixa aviso">
+      <div class="caixa-titulo">Mensagem de erro genérica</div>
+      <p>O <code>catch</code> descarta a exceção e exibe texto fixo. As mensagens específicas de
+      <code>AuthService</code> (<code>'Usuário não encontrado'</code>, <code>'Usuário inválido'</code>,
+      <code>'Senha incorreta'</code>) <strong>não chegam ao usuário</strong>. Documentos como
+      <code>SUMARIO_IND_HABILITADO.md</code> descrevem um container vermelho com a mensagem específica — esse componente
+      <strong>não existe</strong> no código atual.</p>
+    </div>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void dispose()</span><span class="tipo-retorno">ciclo de vida</span></summary>
+  <div class="corpo">
+    <p>Remove os <em>listeners</em> antes de descartar ambos os controllers — ordem correta, evitando callback em objeto
+    descartado.</p>
+  </div>
+</details>
+
+<h3 id="ref-space-page"><code>lib/pages/space_page.dart</code></h3>
+
+<p>Listagem e CRUD de espaços comuns, com filtro por disponibilidade e ordenação por nome ou capacidade. O CRUD só é
+exposto quando <code>isAdmin</code> é verdadeiro.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">enum SpaceSortOption { nome, capacidade }</span></summary>
+  <div class="corpo"><p>Critério de ordenação da lista.</p></div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">enum SpaceFilterOption { todos, disponivel, indisponivel }</span></summary>
+  <div class="corpo"><p>Filtro de status aplicado sobre <code>_isAvailable</code>.</p></div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class CustoInputFormatter extends TextInputFormatter</span><span class="tipo-retorno">formatter</span></summary>
+  <div class="corpo">
+    <p>Restringe o campo «Custo Reserva» a dígitos e <strong>rejeita qualquer valor acima de 500</strong>, devolvendo o
+    valor anterior. Depende de o estado ser controlado pelo próprio widget: retornar <code>oldValue</code> impede que o
+    dígito excedente seja aceito.</p>
+    <p>É <strong>distinto</strong> de <code>_formatCurrency</code>, que formata o valor como moeda ao perder o foco.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class SpacesPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetros:</strong> <code>spaceService</code> (<code>SpaceService</code>, obrigatório),
+    <code>isAdmin</code> (<code>bool</code>, default <code>false</code>).</p>
+    <p>Estado: <code>_spacesFuture</code>, <code>_criterioOrdenacao</code>, <code>_ordemCrescente</code>,
+    <code>_filtroAtual</code> e <code>_notificationService</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">String _formatCurrency(String value)</span></summary>
+  <div class="corpo">
+    <p>Normaliza a entrada (<code>.</code> removido, <code>,</code> → <code>.</code>) e aplica
+    <code>NumberFormat.currency(locale: 'pt_BR', symbol: 'R$')</code>. Retorna <code>'R$ 0,00'</code> quando o valor não
+    é numérico.</p>
+    <p class="etq parcial">Assimetria</p>
+    <p>A formatação é aplicada em <code>FocusNode</code> de perda de foco ao criar, mas o valor salvo no Firestore é
+    <code>int</code> obtido por <code>int.tryParse(custoCtl.text)</code>. Se o campo contiver máscara de moeda nesse
+    momento, o parse falha e a validação rejeita o formulário — o listener de foco e o <em>parse</em> competem.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _atualizarReservasAssociadas(String nomeEspaco)</span><span class="tipo-retorno">assíncrono · batch</span></summary>
+  <div class="corpo">
+    <p>Consulta todas as reservas com <code>espaco == nomeEspaco</code> e aplica <code>status: 'REJEITADA'</code> a todas
+    em um único <code>WriteBatch</code>. Exibe <code>SnackBar</code> com a quantidade atualizada.</p>
+    <p>Invocado apenas no fluxo de <strong>interdição</strong> (<code>_showEditDialog</code>, quando
+    <code>disponivel == false</code>), imediatamente após <code>updateSpace</code> e do envio de notificação global.</p>
+    <p class="etq parcial">Efeito</p>
+    <p>Reservas em qualquer status — inclusive <code>ACEITA</code> — são rejeitadas sem notificação individual ao morador.
+    O morador recebe apenas o aviso global de interdição, que não referencia sua reserva específica.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _mostrarOpcoesFiltro()</span></summary>
+  <div class="corpo">
+    <p>Abre <code>showModalBottomSheet</code> com <code>StatefulBuilder</code>, contendo três <code>ChoiceChip</code>
+    (Todos / Disponíveis / Indisponíveis) e dois <code>ListTile</code> de ordenação (Nome, Capacidade). Cada item de
+    ordenação exibe seta para cima/baixo quando ativo.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _atualizarOrdenacao(SpaceSortOption novoCriterio, StateSetter setModalState)</span></summary>
+  <div class="corpo">
+    <p>Mesmo critério → inverte <code>_ordemCrescente</code>; critério diferente → troca e reinicia ascendente. Chama
+    <code>setState</code> na página e <code>setModalState</code> no modal para atualizar o ícone.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">bool _isAvailable(Map&lt;String, dynamic&gt; space)</span></summary>
+  <div class="corpo">
+    <p>Interpreta <code>status_disponivel</code> com tolerância de tipo:</p>
+    <pre><code>null            → false
+bool            → o próprio valor
+String          → 'S' (case-insensitive) ou 'true'
+outro           → false</code></pre>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _showCreateDialog(BuildContext context)</span></summary>
+  <div class="corpo">
+    <p>Diálogo de criação com campos Nome, Capacidade, Horário Abertura, Horário Fechamento, Custo Reserva, Regras de Uso
+    e switch «Disponível». Validações antes de salvar:</p>
+    <table>
+      <thead><tr><th>Validação</th><th>Mensagem</th></tr></thead>
+      <tbody>
+        <tr><td>Nome vazio</td><td><code>'Nome é obrigatório'</code></td></tr>
+        <tr><td>Horários fora de <code>HH:MM</code></td><td><code>'Horários inválidos. Use o formato HH:MM.'</code></td></tr>
+        <tr><td>Fechamento ≤ abertura</td><td><code>'Horário de fechamento deve ser maior que o horário de abertura.'</code></td></tr>
+        <tr><td>Capacidade ∉ [1, 50]</td><td><code>'Capacidade deve ser um número entre 1 e 50.'</code></td></tr>
+        <tr><td>Custo ∉ [0, 500]</td><td><code>'Custo deve estar entre 0 e 500.'</code></td></tr>
+      </tbody>
+    </table>
+    <p>Payload enviado a <code>createSpace</code>: <code>nome</code>, <code>qtd_pessoas</code>,
+    <code>horario_abertura</code>, <code>horario_fechamento</code>, <code>custo_reserva</code>, <code>regras_uso</code> e
+    <code>status_disponivel</code> (<code>'S'</code>/<code>'N'</code>). Em sucesso, recarrega a lista e mostra
+    <code>SnackBar</code> verde.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _showEditDialog(BuildContext context, Map&lt;String, dynamic&gt; space)</span></summary>
+  <div class="corpo">
+    <p>Diálogo de edição que replica os mesmos campos, acrescidos de <strong>Motivo da Interdição</strong> e
+    <strong>Prazo de Interdição (dias)</strong>, exibidos condicionalmente quando o switch «Disponível» está desligado.</p>
+    <p>Validações adicionais em relação à criação:</p>
+    <ul>
+      <li>Indisponível + motivo vazio → <code>'Motivo da interdição é obrigatório.'</code></li>
+      <li>Prazo vazio ou não numérico → <code>'Prazo de interdição é obrigatório e deve ser numérico.'</code></li>
+    </ul>
+    <p class="etq parcial">Validação do prazo</p>
+    <p>O prazo é exigido <strong>mesmo quando o espaço está disponível</strong> — a verificação não está aninhada na
+    condição de indisponibilidade, ao contrário do motivo.</p>
+    <p>Quando o espaço é salvo como indisponível, a sequência é: <code>updateSpace</code> →
+    <code>enviarNotificacaoGlobal</code> (título «Espaço Interditado») →
+    <code>_atualizarReservasAssociadas</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">bool _isValidTime(String? time)</span></summary>
+  <div class="corpo">
+    <p>Valida <code>HH:MM</code>: duas partes separadas por <code>:</code>, hora em 0–23 e minuto em 0–59. Lógica
+    <strong>duplicada</strong> em <code>reservas_user_page</code> e <code>reservas_admin_page</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _confirmDelete(BuildContext context, Map&lt;String, dynamic&gt; space)</span></summary>
+  <div class="corpo">
+    <p>Diálogo de confirmação que chama <code>deleteSpace</code>. <span class="etq">sem consumidor</span> Não é invocado
+    em nenhum ponto do <code>build</code> — o botão de exclusão foi removido da UI.</p>
+  </div>
+</details>
+
+<h3 id="ref-reservas-user-page"><code>lib/pages/reservas_user_page.dart</code></h3>
+
+<p>Formulário de criação de reserva. Concentra a maior parte das regras de negócio da aplicação e é o único ponto que
+grava reservas no fluxo real.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class HoraInputFormatter extends TextInputFormatter</span><span class="tipo-retorno">formatter</span></summary>
+  <div class="corpo">
+    <p>Máscara de horário: mantém apenas dígitos, limita a 4, e insere <code>:</code> após o segundo dígito. Reposiciona o
+    cursor ao final do texto formatado.</p>
+    <p><strong>Exportado e reutilizado</strong> por <code>space_page.dart</code> e <code>reservas_admin_page.dart</code> —
+    dependência de página para página, sem módulo compartilhado de formatters.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class ReservarEspacoPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetro:</strong> <code>userId</code> (<code>String</code>, obrigatório) — usado como
+    <code>id_morador</code> e para buscar a unidade.</p>
+    <p>Estado: <code>_espaco</code>, <code>_dataReserva</code>, <code>_horaInicio</code>, <code>_horaFim</code>,
+    <code>_observacoes</code>, <code>_qtdConvidados</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">DateTime? horaReserva(Timestamp? dataReserva, String? hora)</span></summary>
+  <div class="corpo">
+    <p>Combina data e horário em um <code>DateTime</code>. Retorna <code>null</code> quando a data é nula, a hora não
+    contém <code>:</code>, não tem exatamente duas partes, ou os componentes não são numéricos.</p>
+    <p>É o utilitário de comparação de intervalos usado em RD-01 e RD-03.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;List&lt;Map&lt;String, dynamic&gt;&gt;&gt; _fetchEspacosDisponiveis()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Consulta <code>espacos</code> filtrando <code>status_disponivel == 'S'</code> e retorna
+    <code>doc.data()</code> de cada resultado.</p>
+    <p class="etq parcial">Tipagem frágil</p>
+    <p>O filtro compara com a string <code>'S'</code>, sem tolerância a <code>bool</code> — diferente de
+    <code>SpacesPage._isAvailable</code>. Espaços gravados com booleano não aparecem no seletor.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _criarReserva()</span><span class="tipo-retorno">assíncrono · regras de negócio</span></summary>
+  <div class="corpo">
+    <p>Sequência completa de validação e gravação. Cada falha interrompe o fluxo com uma <code>SnackBar</code> vermelha.</p>
+    <table>
+      <thead><tr><th>#</th><th>Verificação</th><th>Mensagem</th><th>Regra</th></tr></thead>
+      <tbody>
+        <tr><td>1</td><td><code>Form.validate()</code></td><td>mensagens dos validators</td><td>—</td></tr>
+        <tr><td>2</td><td>campos obrigatórios nulos</td><td><code>'Preencha todos os campos obrigatórios.'</code></td><td>—</td></tr>
+        <tr><td>3</td><td>formato <code>HH:MM</code></td><td><code>'Horários inválidos. Use o formato HH:MM.'</code></td><td>—</td></tr>
+        <tr><td>4</td><td>espaço existe em <code>espacos</code></td><td><code>'Espaço selecionado não encontrado.'</code></td><td>—</td></tr>
+        <tr><td>5</td><td>morador existe em <code>users</code></td><td><code>'Usuário não encontrado.'</code></td><td>—</td></tr>
+        <tr><td>6</td><td><code>id_apartamento</code> presente</td><td><code>'Esta unidade não está cadastrada para o usuário.'</code></td><td>RD-06</td></tr>
+        <tr><td>7</td><td>convidados + 1 ≤ <code>qtd_pessoas</code></td><td><code>'Número máximo permitido neste espaço: N pessoas.'</code></td><td>—</td></tr>
+        <tr><td>8</td><td>horários dentro da abertura/fechamento</td><td><code>'Horário da reserva está fora do horário de funcionamento do espaço.'</code></td><td>RD-07</td></tr>
+        <tr><td>9</td><td><code>hora_inicio &lt; hora_fim</code></td><td><code>'Hora de início deve ser menor que a hora de fim.'</code></td><td>—</td></tr>
+        <tr><td>10</td><td>salão com ≥ 48 h</td><td><code>'O salão de festas exige antecedência mínima de 48 horas.'</code></td><td>RD-02</td></tr>
+        <tr><td>11</td><td>nenhuma reserva do espaço na data</td><td><code>'Já existe uma reserva para este espaço nesta data.'</code></td><td>—</td></tr>
+        <tr><td>12</td><td>sem sobreposição de intervalo da unidade</td><td><code>'Esta unidade já possui uma reserva neste horário.'</code></td><td>RD-03</td></tr>
+        <tr><td>13</td><td>menos de 2 reservas futuras ativas</td><td><code>'Esta unidade já possui 2 reservas futuras.'</code></td><td>RD-01</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Gravação:</strong></p>
+    <pre><code>reservasCollection.doc().set({
+  'data_criacao': FieldValue.serverTimestamp(),
+  'data_reserva': Timestamp.fromDate(_dataReserva!),
+  'espaco': _espaco, 'hora_inicio': _horaInicio, 'hora_fim': _horaFim,
+  'id_unidade': unidade, 'id_morador': widget.userId,
+  'observacoes': _observacoes, 'qtd_convidados': convidadosTotal,
+  'status': 'PENDENTE',
+  'id_reserva': DateTime.now().millisecondsSinceEpoch,
+});</code></pre>
+    <p>Em sucesso, <code>SnackBar</code> verde «Reserva criada com sucesso!» e <code>Navigator.pop</code>.</p>
+
+    <h4>Detalhes de implementação relevantes</h4>
+    <ul>
+      <li><strong>Detecção do salão</strong> — por <em>substring</em> do nome: <code>contains('salão')</code> ou
+      <code>contains('salao')</code>. Um espaço chamado «Salão Gourmet» também é tratado como salão de festas.</li>
+      <li><strong>Conversão de capacidade</strong> — aceita <code>int</code>, <code>String</code> (via
+      <code>int.tryParse</code>) e <code>double</code> (via <code>toInt</code>).</li>
+      <li><strong>Status ativo</strong> — a contagem exclui <code>CANCELADA</code>, <code>RECUSADA</code>,
+      <code>REJEITADA</code> e <code>REALIZADA</code>.</li>
+      <li><strong>Tratamento de erro de gravação</strong> — extrai <code>FirebaseException.message</code> e traduz
+      <code>permission-denied</code> para «acesso não autorizado».</li>
+      <li><strong>Consulta de reservas da unidade</strong> — usa <code>id_unidade</code> + <code>data_reserva &gt;= hoje</code>,
+      amparada pelo índice composto de <code>firestore.indexes.json</code>.</li>
+    </ul>
+    <p class="etq parcial">Ausência de transação</p>
+    <p>As verificações 11–13 são leituras seguidas de escrita, sem transação. Duas submissões simultâneas da mesma unidade
+    podem violar RD-01 e RD-03.</p>
+  </div>
+</details>
+
+<h3 id="ref-minhas-reservas"><code>lib/pages/minhas_reservas_page.dart</code></h3>
+
+<p>Lista reativa das reservas do morador, com filtro por status, ordenação e cancelamento.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class MinhasReservasPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetro:</strong> <code>userId</code> (<code>String</code>, obrigatório).</p>
+    <p>Fonte de dados: <code>StreamBuilder&lt;QuerySnapshot&gt;</code> em
+    <code>reservas.where('id_morador', isEqualTo: userId).snapshots()</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _excluirReserva(String id)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Confirma em <code>AlertDialog</code> e delega a <code>ReservasService.cancelarReserva(id, userId)</code>.</p>
+    <ul>
+      <li>Retorno não nulo → <code>SnackBar</code> vermelha com a mensagem devolvida (prazo, permissão, etc.).</li>
+      <li>Retorno nulo → <code>SnackBar</code> verde «Reserva cancelada com sucesso!».</li>
+    </ul>
+    <p>A lista se atualiza sozinha: o <code>StreamBuilder</code> reage à alteração de <code>status</code> no documento.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _mostrarOpcoesFiltro()</span></summary>
+  <div class="corpo">
+    <p>Bottom sheet com cinco chips de status (Todos, Pendentes, Aceitas, Rejeitadas, Realizadas) e dois critérios de
+    ordenação (Data, Espaço).</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Widget _buildEmptyState()</span></summary>
+  <div class="corpo">
+    <p>Estado vazio com <code>Icons.calendar_today_outlined</code> e o texto «Nenhuma reserva encontrada.».</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _mostrarDetalhes(Map&lt;String, dynamic&gt; reserva)</span></summary>
+  <div class="corpo">
+    <p><code>AlertDialog</code> com Espaço, Data, Horário, Status (colorido), Número de Convidados, Observações,
+    Criada em e, condicionalmente, Motivo do Cancelamento (apenas se <code>status == 'REJEITADA'</code>).</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Color _getStatusColor(String status)</span></summary>
+  <div class="corpo">
+    <table>
+      <thead><tr><th>Status</th><th>Cor</th></tr></thead>
+      <tbody>
+        <tr><td><code>ACEITA</code></td><td>verde</td></tr>
+        <tr><td><code>PENDENTE</code></td><td>laranja</td></tr>
+        <tr><td><code>REJEITADA</code></td><td>vermelho</td></tr>
+        <tr><td><code>REALIZADA</code></td><td>azul</td></tr>
+        <tr><td>outro</td><td>cinza</td></tr>
+      </tbody>
+    </table>
+    <p>Duplicado em <code>all_reservas_user_page</code>, <code>reservas_admin_page</code> e, com variações,
+    <code>dashboard_relatorio</code>.</p>
+  </div>
+</details>
+
+<h3 id="ref-all-reservas-user"><code>lib/pages/all_reservas_user_page.dart</code></h3>
+
+<p>Visão agregada de todas as reservas do condomínio para o morador, com filtro e ordenação. Serve também como ponto de
+entrada para criar nova reserva.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">enum ReservaSortOption { data, espaco }</span></summary>
+  <div class="corpo">
+    <p>Critério de ordenação. <strong>Declarado separadamente</strong> em <code>minhas_reservas_page.dart</code> com o
+    mesmo nome e membros — duas declarações independentes do mesmo enum.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class AllReservasUserPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetro:</strong> <code>userId</code> (<code>String</code>, obrigatório).</p>
+    <p>Fonte: <code>StreamBuilder</code> em <code>reservas.where('status', whereIn: ['ACEITA','PENDENTE']).snapshots()</code>.</p>
+    <p class="etq parcial">Visibilidade ampla</p>
+    <p>A query <strong>não filtra por morador</strong>: o morador vê reservas de todas as unidades. Reservas
+    <code>REJEITADA</code>, <code>CANCELADA</code> e <code>REALIZADA</code> não aparecem, portanto o chip de filtro
+    «Rejeitadas» não existe nesta tela, ao contrário de <code>MinhasReservasPage</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _atualizarOrdenacao(ReservaSortOption novoCriterio, StateSetter setModalState)</span></summary>
+  <div class="corpo">
+    <p>Inverte a direção quando o critério é repetido, ou troca o critério e reinicia ascendente. Sincroniza página e
+    modal.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">String _formatDate(Timestamp timestamp)</span></summary>
+  <div class="corpo">
+    <p>Formata como <code>dd/MM/yyyy</code> com <code>padLeft(2,'0')</code> manual, sem usar <code>intl</code> — embora o
+    pacote esteja disponível e seja usado em outras páginas.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Widget build(BuildContext context)</span><span class="tipo-retorno">UI</span></summary>
+  <div class="corpo">
+    <p>Processa localmente a lista recebida do stream:</p>
+    <ol>
+      <li>Converte <code>snapshot.data!.docs</code> em <code>List&lt;DocumentSnapshot&gt;</code>.</li>
+      <li>Aplica filtro de status em memória (quando diferente de <code>'TODOS'</code>).</li>
+      <li>Ordena por data (<code>Timestamp.compareTo</code>) ou nome do espaço
+      (<code>String.compareTo</code>), respeitando <code>_ordemCrescente</code>.</li>
+    </ol>
+    <p>O <code>orderBy</code> do Firestore foi deliberadamente omitido para permitir ordenação local flexível —
+    comentário presente no código.</p>
+    <p>O <code>FloatingActionButton.extended</code> «Nova Reserva» navega para <code>ReservarEspacoPage</code> e chama
+    <code>setState</code> quando o retorno é <code>true</code>.</p>
+  </div>
+</details>
+
+<h3 id="ref-reservas-admin"><code>lib/pages/reservas_admin_page.dart</code></h3>
+
+<p>Painel administrativo de todas as reservas, com filtro, ordenação por morador e ações de editar/recusar.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">enum CriterioOrdenacao { data, espaco, morador }</span></summary>
+  <div class="corpo"><p>Critério de ordenação do painel, acrescido de «morador» em relação às telas do morador.</p></div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class ReservasAdminPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetro:</strong> <code>authService</code> (<code>AuthService?</code>, opcional) — recebido no drawer,
+    mas <strong>não utilizado</strong> no <code>build</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;List&lt;Map&lt;String, dynamic&gt;&gt;&gt; _fetchReservasComNomes()</span><span class="tipo-retorno">assíncrono · N+1</span></summary>
+  <div class="corpo">
+    <p>Lê todas as reservas e, em paralelo (<code>Future.wait</code>), busca o <code>nome</code> do morador em
+    <code>users</code> para cada <code>id_morador</code>. Injeta <code>id</code> e <code>nome_morador</code>.</p>
+    <table>
+      <thead><tr><th>Situação</th><th><code>nome_morador</code></th></tr></thead>
+      <tbody>
+        <tr><td>Usuário encontrado</td><td><code>nome</code></td></tr>
+        <tr><td>Usuário inexistente</td><td><code>'Desconhecido'</code></td></tr>
+        <tr><td>Sem <code>id_morador</code></td><td><code>'Não informado'</code></td></tr>
+      </tbody>
+    </table>
+    <p>O <code>Future</code> é guardado em <code>_reservasFuture</code> no <code>initState</code> para evitar
+    recarregamentos a cada <em>rebuild</em>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _atualizarLista()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Recria <code>_reservasFuture</code> e aguarda — usado pelo <code>RefreshIndicator</code> (puxar para atualizar) e
+    após edição ou recusa.</p>
+    <p>O <code>ListView</code> de estado vazio existe justamente para manter o gesto de <em>refresh</em> disponível
+    quando não há dados.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _excluirReserva(String id)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Apesar do nome, <strong>recusa</strong> a reserva. Sequência:</p>
+    <ol>
+      <li><code>AlertDialog</code> com <code>TextField</code> para o motivo; confirmação bloqueada quando vazio.</li>
+      <li><code>update({'status': 'REJEITADA', 'motivo_cancelamento': motivo})</code>.</li>
+      <li>Relê o documento para obter <code>id_morador</code>, <code>espaco</code> e <code>data_reserva</code>.</li>
+      <li>Formata a data com <code>DateFormat('dd/MM/yyyy')</code>.</li>
+      <li>Envia <code>enviarNotificacao</code> com <code>tipo: 'reserva_recusada'</code>.</li>
+      <li><code>_atualizarLista()</code> e <code>SnackBar</code> verde.</li>
+    </ol>
+    <p class="etq parcial">Landmines</p>
+    <p>O <code>TextField</code> usa <code>onChanged</code>-free com controller local; a validação de vazio é feita no
+    <em>onPressed</em>. A releitura do documento poderia ser evitada reutilizando o mapa já carregado.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _editarReserva(Map&lt;String, dynamic&gt; reserva, String docId)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p><code>AlertDialog</code> com formulário para Espaço, Hora de Início, Hora de Fim, Motivo do Cancelamento e
+    Observações. Os campos de hora usam <code>HoraInputFormatter</code> (importado de <code>reservas_user_page</code>).</p>
+    <p>Validações: horários em <code>HH:MM</code> e <code>fim &gt; inicio</code> →
+    <code>'Hora de fim deve ser maior que a hora de início.'</code></p>
+    <p>Salva com <code>update</code> direto no Firestore, sem passar por <code>ReservasService</code>. A edição
+    <strong>não valida conflito com outras reservas</strong> nem as regras RD-02/RD-07.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">String _formatDate(dynamic data)</span></summary>
+  <div class="corpo">
+    <p>Retorna apenas a parte de data de <code>Timestamp.toDate().toString().split(' ')[0]</code> — formato
+    <code>yyyy-MM-dd</code>, <strong>inconsistente</strong> com o <code>dd/MM/yyyy</code> usado em
+    <code>AnalisePage</code> e no relatório.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Widget _buildChoiceChip(String label, String valor, StateSetter setModalState, {Color? color})</span></summary>
+  <div class="corpo">
+    <p><code>ChoiceChip</code> com cor de seleção derivada do parâmetro (alfa 0.3) e rótulo em negrito quando ativo.
+    Padrão replicado em cinco páginas.</p>
+  </div>
+</details>
+
+<h3 id="ref-analise-page"><code>lib/pages/analise_page.dart</code></h3>
+
+<p>Fila de aprovação: lista reservas <code>PENDENTE</code> e permite aceitar ou recusar, notificando o morador.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class AnalisePage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p>Sem parâmetros. Estado: <code>_notificationService</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;List&lt;Map&lt;String, dynamic&gt;&gt;&gt; _fetchReservasPendentes()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Consulta <code>reservas.where('status', isEqualTo: 'PENDENTE')</code> e, para cada documento, busca
+    <code>nome</code> em <code>users</code> — em laço <strong>sequencial</strong> (<code>for</code> com <code>await</code>),
+    diferente de <code>ReservasAdminPage</code> e <code>DashboardRelatorioService</code>, que usam
+    <code>Future.wait</code>. O código reconhece a alternativa em comentário («DICA DE PERFORMANCE»).</p>
+    <p>Injeta <code>id</code> e <code>nome_morador</code> (<code>'Desconhecido'</code> quando ausente).</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _atualizarStatus(Map&lt;String, dynamic&gt; reserva, String novoStatus)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Recebe o mapa completo da reserva para poder montar a mensagem de notificação.</p>
+    <ul>
+      <li><strong><code>'REJEITADA'</code></strong> — exige motivo via <code>_mostrarDialogoMotivoCancelamento()</code>;
+      se vazio, mostra «Por favor, informe o motivo.» e aborta. Atualiza <code>status</code> e
+      <code>motivo_cancelamento</code>, e notifica com <code>tipo: 'reserva_recusada'</code>.</li>
+      <li><strong>outro valor</strong> (usado: <code>'ACEITA'</code>) — atualiza apenas <code>status</code> e notifica com
+      <code>tipo: 'reserva_aceita'</code>.</li>
+    </ul>
+    <p>Em seguida exibe <code>SnackBar</code> de confirmação e chama <code>setState</code> para recarregar — o que dispara
+    novamente <code>_fetchReservasPendentes()</code>, pois o <code>FutureBuilder</code> recebe um novo <code>Future</code>
+    a cada build.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;String?&gt; _mostrarDialogoMotivoCancelamento()</span></summary>
+  <div class="corpo">
+    <p><code>AlertDialog</code> com <code>TextField</code> multilinha (máx. 3 linhas) e <em>hint</em> «Ex: Manutenção,
+    Regras do condomínio...». Retorna o texto ou <code>null</code> em cancelamento.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _mostrarDetalhes(BuildContext context, Map&lt;String, dynamic&gt; reserva)</span></summary>
+  <div class="corpo">
+    <p>Diálogo somente leitura com Espaço, Responsável, Data, Horário, Quantidade de Pessoas e Status.</p>
+  </div>
+</details>
+
+<h3 id="ref-notifications-page"><code>lib/pages/notifications_page.dart</code></h3>
+
+<p>Caixa de entrada de notificações do usuário.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class NotificationsPage extends StatelessWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetro:</strong> <code>userId</code> (<code>String</code>, obrigatório).</p>
+    <p>Fonte: <code>StreamBuilder</code> em <code>notificacoes.where('destinatario_id', isEqualTo: userId)</code>.</p>
+    <p class="etq parcial">Ordenação em memória</p>
+    <p>O <code>orderBy('data_criacao')</code> está comentado no código; a ordenação decrescente é feita após a leitura,
+    com <code>Timestamp.fromDate(DateTime(2000))</code> como valor de proteção contra nulos.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">IconData _getIconForType(String? tipo)</span></summary>
+  <div class="corpo">
+    <table>
+      <thead><tr><th><code>tipo</code></th><th>Ícone</th></tr></thead>
+      <tbody>
+        <tr><td><code>'reserva_aceita'</code></td><td><code>Icons.check_circle</code></td></tr>
+        <tr><td><code>'reserva_recusada'</code></td><td><code>Icons.cancel</code></td></tr>
+        <tr><td><code>'geral'</code></td><td><code>Icons.info</code></td></tr>
+        <tr><td>default</td><td><code>Icons.notifications</code></td></tr>
+      </tbody>
+    </table>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">String _formatTime(Timestamp? timestamp)</span></summary>
+  <div class="corpo">
+    <p><code>DateFormat('dd/MM HH:mm')</code>; string vazia para nulo.</p>
+  </div>
+</details>
+
+<p><strong>Comportamentos:</strong> notificações não lidas recebem fundo índigo com alfa 0.05 e título em negrito. Tocar
+chama <code>marcarComoLida</code>. Arrastar (<code>Dismissible</code>) apaga o documento diretamente via
+<code>FirebaseFirestore.instance.collection('notificacoes').doc(docId).delete()</code> — <strong>sem confirmação</strong> e
+sem passar pelo serviço.</p>
+
+<h3 id="ref-user-crud"><code>lib/pages/user_crud.dart</code></h3>
+
+<p>Gestão de moradores: listagem com filtro por papel e ordenação, criação com senha, edição e exclusão.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">enum UserSortOption { nome, apartamento }</span></summary>
+  <div class="corpo"><p>Critério de ordenação da lista de usuários.</p></div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">enum UserFilterOption { todos, admin, usuario }</span></summary>
+  <div class="corpo"><p>Filtro por papel; «usuario» abrange qualquer <code>role != 'admin'</code>.</p></div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class CpfInputFormatter extends TextInputFormatter</span><span class="tipo-retorno">formatter</span></summary>
+  <div class="corpo">
+    <p>Máscara progressiva de CPF, limitada a 11 dígitos: <code>000</code> → <code>000.000</code> →
+    <code>000.000.000</code> → <code>000.000.000-00</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class TelefoneInputFormatter extends TextInputFormatter</span><span class="tipo-retorno">formatter</span></summary>
+  <div class="corpo">
+    <p>Máscara progressiva de telefone, limitada a 11 dígitos: <code>(00</code> → <code>(00)0000</code> →
+    <code>(00)00000-0000</code> → <code>(00)00000-0000</code> (11 dígitos).</p>
+    <p class="etq parcial">Atenção</p>
+    <p>A ramificação de 10 dígitos produz <code>(00)00000-0000</code> posicionando o hífen após o 7º dígito, e a de 11
+    dígitos faz o mesmo. O <em>regex</em> de validação do formulário exige <code>\(\d{2}\)\d{5}-\d{4}</code>, que
+    corresponde apenas ao caso de 11 dígitos — telefones fixos (10 dígitos) são rejeitados.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">class UserCrudPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p><strong>Parâmetro:</strong> <code>userService</code> (<code>UserService</code>, obrigatório).</p>
+    <p>Estado: <code>_users</code>, <code>_criterioOrdenacao</code>, <code>_ordemCrescente</code>,
+    <code>_filtroAtual</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void initState()</span><span class="tipo-retorno">ciclo de vida</span></summary>
+  <div class="corpo">
+    <p>Copia <code>userService.users</code> para <code>_users</code>, registra <code>_onUsersChanged</code> como
+    <em>listener</em> e agenda <code>_reloadUsers()</code> em <code>addPostFrameCallback</code> — evitando
+    <code>setState</code> durante o primeiro build.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _reloadUsers()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Aguarda <code>userService.loadUsers()</code> e sincroniza <code>_users</code>, com guarda <code>if (mounted)</code>.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _onUsersChanged()</span></summary>
+  <div class="corpo">
+    <p><em>Callback</em> do <code>ChangeNotifier</code>: sincroniza <code>_users</code> quando o serviço notifica.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Widget build(BuildContext context)</span><span class="tipo-retorno">UI</span></summary>
+  <div class="corpo">
+    <p>Copia a lista, aplica filtro por papel e ordena:</p>
+    <ul>
+      <li><strong>Nome</strong> — <code>extra['nome']</code> com <em>fallback</em> para <code>username</code>, comparados
+      em minúsculas.</li>
+      <li><strong>Apartamento</strong> — conversão para <code>int</code> (para que <code>2</code> preceda <code>10</code>),
+      com <code>99999</code> como sentinela para valores não numéricos; empate cai para comparação de string.</li>
+    </ul>
+    <p>Estado vazio distingue duas situações: <code>Icons.person_outline</code> com «Nenhum usuário cadastrado» (lista
+    realmente vazia) e <code>Icons.filter_list_off</code> com «Nenhum usuário encontrado com este filtro».</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _showUserForm({User? user})</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Formulário de criação/edição em <code>AlertDialog</code> com <code>StatefulBuilder</code> para permitir exibir
+    erros inline sem fechar o diálogo.</p>
+    <table>
+      <thead><tr><th>Campo</th><th>Validação</th></tr></thead>
+      <tbody>
+        <tr><td>Login</td><td>obrigatório</td></tr>
+        <tr><td>Nome</td><td>obrigatório</td></tr>
+        <tr><td>CPF</td><td>obrigatório + formato <code>^\d{3}\.\d{3}\.\d{3}-\d{2}$</code></td></tr>
+        <tr><td>Email</td><td>obrigatório (sem validação de formato)</td></tr>
+        <tr><td>Telefone</td><td>obrigatório + formato <code>^\(\d{2}\)\d{5}-\d{4}$</code></td></tr>
+        <tr><td>Apartamento</td><td>obrigatório, numérico e único entre usuários</td></tr>
+        <tr><td>Papel</td><td>dropdown <code>user</code>/<code>admin</code></td></tr>
+        <tr><td>Senha</td><td>obrigatória apenas na criação, mínimo 4 caracteres</td></tr>
+      </tbody>
+    </table>
+    <p><strong>Criação</strong> — chama <code>addUserWithPassword</code> com o CPF sem máscara.</p>
+    <p><strong>Edição</strong> — monta <code>extra</code> com <code>nome</code>, <code>cpf</code> (sem máscara),
+    <code>email</code>, <code>telefone</code> e <code>id_apartamento</code>; preserva <code>ind_habilitado</code> do
+    usuário original; chama <code>updateUser</code>.</p>
+    <p>Erros do serviço são exibidos em um <code>Container</code> vermelho no topo do formulário, mantendo o diálogo
+    aberto para correção.</p>
+    <div class="caixa critico">
+      <div class="caixa-titulo"><code>ind_habilitado</code> não é editável pela UI</div>
+      <p>O formulário <strong>não possui</strong> seletor de status. O valor é apenas transportado
+      (<code>ind_habilitado: user.ind_habilitado</code>), de modo que um administrador <strong>não consegue
+      desabilitar</strong> um morador pela interface, embora <code>AuthService</code>, <code>UserService</code> e as
+      regras de negócio tratem esse estado.</p>
+      <p>Documentos como <code>SUMARIO_IND_HABILITADO.md</code> e <code>VERIFICACAO_IND_HABILITADO.md</code> descrevem
+      um dropdown «Habilitado/Desabilitado» que <strong>não existe</strong> no código atual.</p>
+    </div>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _confirmDelete(User user)</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Confirmação antes de <code>userService.deleteUser</code>. Não há proteção contra excluir o último administrador nem
+    a própria conta em uso.</p>
+  </div>
+</details>
+
+<h3 id="ref-dashboard"><code>lib/pages/dashboard_relatorio.dart</code></h3>
+
+<p>Relatório de utilização por período, com resumo, distribuição por espaço e listagem detalhada.</p>
+
+<details class="api" open>
+  <summary><span class="assinatura">class DashboardRelatorioPage extends StatefulWidget</span><span class="tipo-retorno">página</span></summary>
+  <div class="corpo">
+    <p>Sem parâmetros. Estado: <code>_allSpaces</code>, <code>_allReservations</code>, <code>_isLoading</code>,
+    <code>_startMonth</code>/<code>_startYear</code>, <code>_endMonth</code>/<code>_endYear</code>,
+    <code>_metrics</code>, <code>_months</code>.</p>
+    <p>O período inicia no mês/ano corrente em ambas as extremidades.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Future&lt;void&gt; _initializeData()</span><span class="tipo-retorno">assíncrono</span></summary>
+  <div class="corpo">
+    <p>Carrega espaços e reservas em sequência, atualiza o estado e calcula as métricas. Em erro, registra
+    <code>print</code> e desativa o carregamento sem exibir mensagem ao usuário.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">void _updateMetrics()</span></summary>
+  <div class="corpo">
+    <p>Converte o período em datas concretas e delega a <code>calculateGeneralMetrics</code>:</p>
+    <pre><code>startDate = DateTime(_startYear, _startMonth, 1);
+endDate   = DateTime(_endYear, _endMonth + 1, 0, 23, 59, 59);</code></pre>
+    <p>O truque <code>mês + 1, dia 0</code> obtém o último dia do mês de encerramento.</p>
+    <p class="etq parcial">Período invertido</p>
+    <p>Nada impede selecionar início posterior ao fim; nesse caso a lista filtrada será vazia sem aviso.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">List&lt;int&gt; _getYears()</span></summary>
+  <div class="corpo">
+    <p>Gera os anos de 2020 até o ano corrente, inclusive — limite inferior fixo em código.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Widget _buildSummarySection()</span></summary>
+  <div class="corpo">
+    <p>Dois cartões de destaque («Total Reservas» e «Mais Popular») e um cartão «Reservas por Espaço» com
+    <code>LinearProgressIndicator</code> por linha, exibindo contagem e percentual com uma casa decimal.</p>
+  </div>
+</details>
+
+<details class="api">
+  <summary><span class="assinatura">Widget _buildDetailedListSection()</span></summary>
+  <div class="corpo">
+    <p>Lista as reservas do período ordenadas por data decrescente (<code>DateTime(2000)</code> como sentinela para
+    nulos), exibindo espaço, morador, data, intervalo e status colorido.</p>
+  </div>
+</details>
+
+<h3 id="ref-documentacao"><code>lib/pages/documentacao.dart</code></h3>
+
+<details class="api" open>
+  <summary><span class="assinatura">class DocumentacaoPage extends StatelessWidget</span><span class="tipo-retorno">página estática</span></summary>
+  <div class="corpo">
+    <p>Tela «Sobre», acessível pelo drawer. Renderiza um único <code>Text.rich</code> com seções: «Sistema de Reservas do
+    Condomínio», «Acesso Personalizado», «Visualização dos Espaços», «Reservas», «Segurança e Armazenamento» e
+    «Experiência Intuitiva».</p>
+    <p>Sem parâmetros, sem estado, sem dependência de serviços — conteúdo integralmente hardcoded.</p>
+  </div>
+</details>
+</section>
+
+<!-- ===== ÓRFÃOS ===== -->
+<section id="orfaos">
+<h2 id="arquivos-orfaos">Arquivos órfãos</h2>
+
+<div class="caixa aviso">
+  <div class="caixa-titulo">Cinco arquivos inalcançáveis</div>
+  <p>Busca textual por <code>CalendarPage</code>, <code>ManagementPage</code>, <code>AreasCrudPage</code>,
+  <code>EspacosPage</code> e <code>HomePage</code> retorna apenas as próprias declarações. Busca por padrões de import
+  correspondentes retorna <strong>zero resultados</strong>. Nenhum é instanciado a partir de <code>main.dart</code>.</p>
+  <p><span class="etq parcial">⚠️ Não determinado a partir do código</span> Se são trabalho em andamento ou resíduo a
+  remover. Dois arquivos carregam o marcador interno
+  <code>!! VERIFICAR SE ESSA PAGINA É USADA !!</code>.</p>
+</div>
+
+<h3 id="ref-home-page"><code>lib/pages/home_page.dart</code></h3>
+<p><strong>Classe:</strong> <code>HomePage extends StatelessWidget</code> — recebe <code>authService</code>. Exibe
+<code>'Welcome, ${user?.username}'</code>, ícone de logout e, condicionalmente, «Admin Dashboard» com botão «Manage Users»
+ou «User Dashboard» com botão «View Profile». Ambos os <code>onPressed</code> contêm apenas um comentário
+<code>// Navigate to ...</code> — <strong>sem implementação</strong>. Marcado com o aviso de verificação de uso.</p>
+
+<h3 id="ref-espacos-page"><code>lib/pages/espacos_page.dart</code></h3>
+<p><strong>Classe:</strong> <code>EspacosPage extends StatefulWidget</code> — recebe <code>List&lt;Map&gt; espacos</code>.
+Layout mestre-detalhe: painel lateral de 300 px com lista e painel principal com cartão em gradiente. Usa
+<code>WillPopScope</code> para devolver a lista ao voltar. Trabalha com campos <code>emoji</code>, <code>cor</code>,
+<code>status</code>, <code>descricao</code> e <code>detalhes</code>, que <strong>não existem</strong> no esquema real de
+<code>espacos</code>. Marcado com o aviso de verificação de uso. Superseded por <code>space_page.dart</code>.</p>
+
+<h3 id="ref-management-page"><code>lib/pages/management_page.dart</code></h3>
+<p><strong>Classe:</strong> <code>ManagementPage extends StatefulWidget</code> — recebe <code>managementService</code> e
+<code>authService</code>. Lista reservas filtrando por papel (admin vê todas, usuário vê as suas) e usa
+<code>print</code> para depuração. Marcado com o aviso de verificação de uso. Sobreposto por
+<code>ReservasAdminPage</code> e <code>MinhasReservasPage</code>.</p>
+
+<h3 id="ref-calendar-page"><code>lib/pages/calendar_page.dart</code></h3>
+<p><strong>Classes:</strong> <code>Booking</code> (modelo com <code>espaco</code>, <code>date</code>, <code>time</code>,
+<code>durationMinutes</code>, <code>reservedBy</code>, com <code>toJson</code>/<code>fromJson</code>) e
+<code>CalendarPage extends StatefulWidget</code>.</p>
+<div class="caixa critico">
+  <div class="caixa-titulo">Persistência paralela ao Firestore</div>
+  <p>Toda a agenda é gravada em <code>SharedPreferences</code> sob a chave <code>bookings_list</code>, como JSON — nunca
+  toca o Firestore. Implementa seu próprio fluxo de confirmação de identidade (usuário + senha via
+  <code>verifyCredentials</code>), seleção de duração com <code>Slider</code> de 30 a 240 minutos, detecção de conflito
+  por comparação de string de horário e cancelamento restrito a administradores.</p>
+  <p>Os dados ficam <strong>isolados por dispositivo</strong>: não há sincronização, e o modelo não corresponde a
+  <code>reservas</code>. A detecção de conflito descrita no código é «same space and overlapping time (by string compare
+  for simplicity)» — na prática compara apenas igualdade de horário.</p>
+</div>
+
+<h3 id="ref-areas-crud"><code>lib/areas_crud.dart</code></h3>
+<p><strong>Classe:</strong> <code>AreasCrudPage extends StatefulWidget</code> — recebe <code>List&lt;Map&gt; espacos</code>.
+CRUD <strong>puramente em memória</strong>: adiciona, edita e remove itens de <code>_list</code> e devolve via
+<code>Navigator.pop(context, _list)</code>. Nenhuma persistência. Oferece seleção de cor entre nove opções
+(<code>Indigo</code>, <code>Blue</code>, <code>Green</code>, …), emoji, status (Disponível/Ocupado/Manutenção) e campos de
+<code>detalhes</code> (capacidade, equipamentos, horário, regras).</p>
+<p>Está na <strong>raiz</strong> de <code>lib/</code>, não em <code>lib/pages/</code>, quebrando a convenção de
+organização do projeto.</p>
+</section>
+
+<!-- ===== RISCOS ===== -->
+<section id="riscos">
+<h2 id="riscos-limitacoes">Riscos e limitações conhecidas</h2>
+
+<table>
+  <thead><tr><th>#</th><th>Risco</th><th>Impacto</th><th>Evidência</th></tr></thead>
+  <tbody>
+    <tr><td>1</td><td>Regra «uma reserva por espaço por dia» é mais restritiva que RD-03 e não documentada</td><td>Reservas legítimas em horários distintos são bloqueadas sem justificativa formal</td><td><code>reservas_user_page</code>, <code>reservas_service</code></td></tr>
+    <tr><td>2</td><td>Renomear espaço não atualiza <code>reservas.espaco</code></td><td>Reservas órfãs em relação ao cadastro</td><td><code>SpaceService.updateSpace</code></td></tr>
+    <tr><td>3</td><td><code>REALIZADA</code> nunca é produzida</td><td>Histórico não distingue reservas passadas de futuras</td><td>Figura 3</td></tr>
+    <tr><td>4</td><td><code>ReservasService</code> tem métodos incompatíveis e não usados</td><td>Divergência de vocabulário induz a erro de manutenção</td><td><code>aprovarOuRecusarReserva</code></td></tr>
+    <tr><td>5</td><td>Duas classes <code>User</code> incompatíveis</td><td>Risco de confusão em manutenção</td><td><code>models/user.dart</code> vs <code>auth_service.dart</code></td></tr>
+    <tr><td>6</td><td>Cinco arquivos órfãos</td><td>Confusão sobre fonte de verdade, especialmente <code>calendar_page</code></td><td>Seção «Arquivos órfãos»</td></tr>
+    <tr><td>7</td><td>Criação de reserva não transacional</td><td>Violação de RD-01/RD-03 sob concorrência</td><td><code>_criarReserva</code></td></tr>
+    <tr><td>8</td><td>Teste automatizado incoerente</td><td><code>flutter test</code> falha; ausência de rede de segurança</td><td><code>test/widget_test.dart</code></td></tr>
+    <tr><td>9</td><td>Interdição rejeita reservas sem notificação individual</td><td>Morador não é avisado diretamente da perda da reserva</td><td><code>_atualizarReservasAssociadas</code></td></tr>
+    <tr><td>10</td><td>Documentação histórica diverge do código</td><td>Dropdown de status e container de erro inexistentes</td><td>Ver abaixo</td></tr>
+    <tr><td>11</td><td>Ausência de backup</td><td>Perda de dados sem recuperação</td><td>RNF-06</td></tr>
+    <tr><td>12</td><td>Linux sem Firebase</td><td>Build compila mas não inicializa</td><td><code>firebase_options.dart</code></td></tr>
+  </tbody>
+</table>
+
+<h3 id="testes">Testes</h3>
+
+<div class="caixa critico">
+  <div class="caixa-titulo"><code>test/widget_test.dart</code> é boilerplate incoerente</div>
+  <p>O arquivo contém <code>testWidgets('Counter increments smoke test')</code>, que monta <code>MyApp</code>, espera os
+  textos <code>'0'</code>/<code>'1'</code> e toca <code>Icons.add</code>. O app não possui contador nem esse ícone na home
+  (o FAB é <code>FloatingActionButton.extended</code> rotulado «Relatório»). O teste também instancia
+  <code>AuthService</code> e <code>UserService</code> sem <code>Firebase.initializeApp</code>.</p>
+  <p>Não há testes de unidade para <code>ReservasService</code>, <code>SpaceService</code>, <code>UserService</code> ou
+  <code>AuthService</code>, nem testes de widget para páginas. Cobertura observada: apenas o arquivo de template.</p>
+</div>
+
+<h3 id="divergencia-docs">Divergência entre documentação histórica e código</h3>
+
+<table>
+  <thead><tr><th>Documento</th><th>Descreve</th><th>Código atual</th></tr></thead>
+  <tbody>
+    <tr>
+      <td><code>SUMARIO_IND_HABILITADO.md</code><br><code>VERIFICACAO_IND_HABILITADO.md</code></td>
+      <td>Container vermelho com mensagem específica de erro na tela de login</td>
+      <td><code>LoginPage</code> usa <code>SnackBar</code> com texto fixo «❌ Login ou Senha inválidos»</td>
+    </tr>
+    <tr>
+      <td><code>SUMARIO_IND_HABILITADO.md</code><br><code>VERIFICACAO_IND_HABILITADO.md</code></td>
+      <td>Dropdown «Status» (Habilitado/Desabilitado) em <code>user_crud.dart</code></td>
+      <td>Não existe; <code>ind_habilitado</code> é preservado mas não editável</td>
+    </tr>
+    <tr>
+      <td><code>FLUXO_VALIDACAO_LOGIN.md</code></td>
+      <td>Validação de <code>ind_habilitado</code> em login, <code>verifyCredentials</code> e inicialização</td>
+      <td><span class="etq ok">confere</span> implementado em <code>auth_service.dart</code></td>
+    </tr>
+  </tbody>
+</table>
+</section>
+
+<!-- ===== AMBIENTE ===== -->
+<section id="ambiente">
+<h2 id="execucao">Execução e ambiente</h2>
+
+<h3 id="como-executar">Como executar</h3>
+<p>Conforme <code>README.md</code>:</p>
+<ol>
+  <li>Clonar o repositório.</li>
+  <li><code>flutter pub get</code></li>
+  <li><code>flutter run</code></li>
+</ol>
+<p><strong>Pré-requisitos:</strong> Flutter SDK e Dart SDK.</p>
+
+<h3 id="premissas">Premissas e dependências externas</h3>
+<table>
+  <thead><tr><th>Item</th><th>Descrição</th></tr></thead>
+  <tbody>
+    <tr><td>Projeto Firebase ativo</td><td><code>projeto-ihc-5530a</code> com Firestore habilitado</td></tr>
+    <tr><td>Configuração por plataforma</td><td><code>android/app/google-services.json</code>, <code>ios/Runner/GoogleService-Info.plist</code>, <code>macos/Runner/GoogleService-Info.plist</code></td></tr>
+    <tr><td>Cadastro inicial</td><td>É necessário ao menos um usuário <code>admin</code> em <code>users</code></td></tr>
+    <tr><td>Cadastro de espaços</td><td>Nenhum espaço é semeado pelo código</td></tr>
+    <tr><td>Conectividade</td><td>Operação plena exige rede; autenticação tem <em>fallback</em> offline</td></tr>
+    <tr><td>Flutter SDK</td><td><code>&ge;3.35.0</code> / Dart <code>^3.9.2</code></td></tr>
+  </tbody>
+</table>
+<p><span class="etq parcial">⚠️ Não determinado</span> Versões mínimas de sistema operacional por plataforma, requisitos de
+assinatura para distribuição e processo de CI/CD.</p>
+
+<h3 id="dataconnect">Camada Data Connect (não integrada)</h3>
+<p>O diretório <code>dataconnect/</code> contém <code>dataconnect.yaml</code> (PostgreSQL, Cloud SQL
+<code>projetoihc-fdc</code>, base <code>fdcdb</code>, região <code>southamerica-east1</code>),
+<code>schema/schema.gql</code> (tipos <code>User</code>, <code>CommonArea</code>, <code>Booking</code>, <code>Rule</code>,
+<code>Availability</code>), <code>example/queries.gql</code> e <code>seed_data.gql</code>.</p>
+<p><strong>Não há</strong> seção <code>dataconnect</code> em <code>firebase.json</code> nem dependência
+<code>firebase_data_connect</code> em <code>pubspec.yaml</code>. O modelo relacional proposto difere do modelo real
+(campos como <code>bookingDuration</code> e tabelas <code>Rule</code>/<code>Availability</code> não têm equivalente em
+Firestore).</p>
+<p><span class="etq parcial">⚠️ Não determinado</span> Se é migração planejada para PostgreSQL ou resíduo do template do
+FlutterFire CLI.</p>
+
+<h3 id="analise-estatica">Análise estática</h3>
+<p><code>analysis_options.yaml</code> inclui <code>package:flutter_lints/flutter.yaml</code> e exclui
+<code>build/**</code>, <code>android/**</code>, <code>ios/**</code>, <code>web/**</code>, <code>windows/**</code>,
+<code>macos/**</code>, <code>linux/**</code>. Nenhuma regra customizada habilitada ou desabilitada.</p>
+<p>Nota: <code>flutter_lints</code> está declarado dentro do bloco <code>flutter_launcher_icons</code> de
+<code>pubspec.yaml</code>, não em <code>dev_dependencies</code> — posicionamento atípico, embora o YAML seja válido.</p>
+</section>
+
+<!-- ===== GLOSSÁRIO ===== -->
+<section id="glossario">
+<h2 id="glossario-termos">Glossário</h2>
+
+<table>
+  <thead><tr><th>Termo</th><th>Definição</th></tr></thead>
+  <tbody>
+    <tr><td><strong>Espaço comum</strong></td><td>Área de lazer ou convivência do condomínio sujeita a reserva</td></tr>
+    <tr><td><strong>Unidade</strong></td><td>Apartamento identificado por <code>id_apartamento</code>, ao qual reservas são vinculadas</td></tr>
+    <tr><td><strong>Morador</strong></td><td>Usuário com <code>role = 'user'</code></td></tr>
+    <tr><td><strong>Administrador</strong></td><td>Usuário com <code>role = 'admin'</code></td></tr>
+    <tr><td><strong><code>ind_habilitado</code></strong></td><td>Indicador binário <code>'S'</code>/<code>'N'</code> que autoriza ou bloqueia o login</td></tr>
+    <tr><td><strong>Reserva</strong></td><td>Documento em <code>reservas</code> que associa unidade, morador, espaço, data e intervalo</td></tr>
+    <tr><td><strong>Interdição</strong></td><td>Estado do espaço (<code>status_disponivel = 'N'</code>) com motivo e prazo estimado</td></tr>
+    <tr><td><strong>Aprovação mediada</strong></td><td>Fluxo em que a reserva depende de decisão do administrador</td></tr>
+    <tr><td><strong>Notificação</strong></td><td>Documento em <code>notificacoes</code> endereçado a um <code>destinatario_id</code></td></tr>
+    <tr><td><strong><code>role</code></strong></td><td>Papel do usuário, base do controle de acesso na UI</td></tr>
+    <tr><td><strong>Órfão</strong></td><td>Arquivo ou método sem aresta de entrada no grafo de dependências</td></tr>
+  </tbody>
+</table>
+
+<h2 id="ambiguidades">Ambiguidades registradas</h2>
+
+<ol>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Se os cinco arquivos órfãos são trabalho em andamento ou resíduo a remover.</li>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Se <code>dataconnect/</code> representa migração planejada para PostgreSQL.</li>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Se a regra «uma reserva por espaço por dia» é política intencional ou efeito colateral de uma checagem simplificada.</li>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Se RNF-06 (backup) é atendido por procedimento operacional externo ao repositório.</li>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Qual é a política de privacidade e retenção dos dados pessoais (CPF, telefone, e-mail).</li>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Se há ambientes separados (desenvolvimento/produção); apenas um projeto Firebase é referenciado.</li>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Se o produto será distribuído em lojas de aplicativos ou apenas internamente.</li>
+  <li><span class="etq parcial">⚠️ Não determinado</span> Por que o pacote mantém o nome de template <code>flutter_application_1</code>.</li>
+</ol>
+
+<h2 id="nota-rodape">Nota sobre esta documentação</h2>
+
+<p>Artefatos gerados por leitura estática do repositório, sem execução da aplicação e sem acesso ao Firestore em
+produção. Todos os campos de dados são <strong>inferidos</strong> das escritas observadas no código; documentos
+pré-existentes no banco podem conter campos adicionais não mapeados.</p>
+
+<p>Nenhum código-fonte foi alterado. As ambiguidades acima estão marcadas explicitamente em vez de supridas por
+suposição, conforme a convenção adotada.</p>
+
+<table>
+  <thead><tr><th>Artefato</th><th>Conteúdo</th></tr></thead>
+  <tbody>
+    <tr><td><code>docs/generated/_discovery.md</code></td><td>Inventário técnico: arquivos, dependências, esquemas, matrizes de rastreabilidade</td></tr>
+    <tr><td><code>docs/generated/scope.md</code></td><td>Documento de escopo expandido</td></tr>
+    <tr><td><code>docs/generated/index.html</code></td><td>Este monolito autocontido</td></tr>
+  </tbody>
+</table>
+</section>
+
+</main>
+</div>
+
+<script>
+(function () {
+  "use strict";
+
+  /* ============================================================
+     1. TEMA — preferência salva; fallback para prefers-color-scheme
+     ============================================================ */
+  var raiz = document.documentElement;
+  var btnTema = document.getElementById("btn-tema");
+
+  function aplicarTema(t) {
+    raiz.setAttribute("data-theme", t);
+    btnTema.textContent = t === "dark" ? "☀" : "◐";
+    btnTema.setAttribute("aria-label", t === "dark" ? "Ativar tema claro" : "Ativar tema escuro");
+  }
+
+  var salvo = null;
+  try { salvo = localStorage.getItem("sigec-tema"); } catch (e) {}
+  if (salvo) {
+    aplicarTema(salvo);
+  } else if (window.matchMedia && window.matchMedia("(prefers-color-scheme: dark)").matches) {
+    aplicarTema("dark");
+  }
+
+  btnTema.addEventListener("click", function () {
+    var novo = raiz.getAttribute("data-theme") === "dark" ? "light" : "dark";
+    aplicarTema(novo);
+    try { localStorage.setItem("sigec-tema", novo); } catch (e) {}
+  });
+
+  /* ============================================================
+     2. SUMÁRIO — gerado a partir de h2/h3 do conteúdo
+     ============================================================ */
+  var conteudo = document.getElementById("conteudo");
+  var listaToc = document.getElementById("toc-lista");
+  var toc = document.getElementById("toc");
+
+  var cabecalhos = conteudo.querySelectorAll("h2[id], h3[id]");
+  var entradas = [];
+
+  function textoLimpo(el) { return el.textContent.replace(/\s+/g, " ").trim(); }
+
+  cabecalhos.forEach(function (h) {
+    var nivel = h.tagName === "H2" ? 2 : 3;
+    var li = document.createElement("li");
+    li.className = "nivel-" + nivel;
+    var a = document.createElement("a");
+    a.href = "#" + h.id;
+    a.textContent = textoLimpo(h);
+    li.appendChild(a);
+    listaToc.appendChild(li);
+    entradas.push({ alvo: h, link: a });
+  });
+
+  /* Destaque do item ativo conforme a rolagem */
+  var observer = new IntersectionObserver(function (itens) {
+    itens.forEach(function (it) {
+      if (it.isIntersecting) {
+        entradas.forEach(function (e) { e.link.classList.remove("ativo"); });
+        var achado = entradas.filter(function (e) { return e.alvo === it.target; })[0];
+        if (achado) {
+          achado.link.classList.add("ativo");
+          var r = achado.link.getBoundingClientRect();
+          var rt = toc.getBoundingClientRect();
+          if (r.top < rt.top || r.bottom > rt.bottom) {
+            achado.link.scrollIntoView({ block: "nearest" });
+          }
+        }
+      }
+    });
+  }, { rootMargin: "-72px 0px -70% 0px", threshold: 0 });
+
+  entradas.forEach(function (e) { observer.observe(e.alvo); });
+
+  /* ============================================================
+     3. SUMÁRIO MÓVEL
+     ============================================================ */
+  var btnMenu = document.getElementById("btn-menu");
+  var veu = document.getElementById("veu");
+
+  function fecharMenu() {
+    toc.classList.remove("aberto");
+    veu.classList.remove("ativo");
+    btnMenu.setAttribute("aria-expanded", "false");
+  }
+
+  btnMenu.addEventListener("click", function () {
+    var aberto = toc.classList.toggle("aberto");
+    veu.classList.toggle("ativo", aberto);
+    btnMenu.setAttribute("aria-expanded", aberto ? "true" : "false");
+  });
+
+  veu.addEventListener("click", fecharMenu);
+  toc.addEventListener("click", function (ev) {
+    if (ev.target.tagName === "A") fecharMenu();
+  });
+
+  /* ============================================================
+     4. BUSCA — índice em memória, atalho "/", navegação por teclado
+     ============================================================ */
+  var campo = document.getElementById("busca");
+  var painel = document.getElementById("painel-busca");
+
+  /* Constrói o índice: cada cabeçalho delimita um bloco de conteúdo */
+  var indice = [];
+  var blocos = conteudo.querySelectorAll("section");
+
+  blocos.forEach(function (sec) {
+    var nos = Array.prototype.slice.call(sec.querySelectorAll("h1[id], h2[id], h3[id]"));
+    var tituloSecao = "";
+
+    nos.forEach(function (h, i) {
+      if (h.tagName === "H1") tituloSecao = textoLimpo(h);
+
+      /* Coleta o texto entre este cabeçalho e o próximo */
+      var partes = [];
+      var irmao = h.nextElementSibling;
+      while (irmao && !/^H[123]$/.test(irmao.tagName)) {
+        partes.push(irmao.textContent);
+        irmao = irmao.nextElementSibling;
+      }
+
+      /* Se o cabeçalho abre a seção, herda o corpo do sub-cabeçalho seguinte
+         para que o termo ainda possa ser encontrado. */
+      if (partes.join(" ").length < 40 && i + 1 < nos.length) {
+        var prox = nos[i + 1];
+        var p2 = [];
+        var irmao2 = prox.nextElementSibling;
+        while (irmao2 && !/^H[123]$/.test(irmao2.tagName)) {
+          p2.push(irmao2.textContent);
+          irmao2 = irmao2.nextElementSibling;
+        }
+        partes = partes.concat(p2);
+      }
+
+      indice.push({
+        id: h.id,
+        titulo: textoLimpo(h),
+        texto: h.textContent + " " + partes.join(" "),
+        hierarquia: tituloSecao
+      });
+    });
+  });
+
+  function escaparHtml(s) {
+    return s.replace(/[&<>"']/g, function (c) {
+      return { "&": "&amp;", "<": "&lt;", ">": "&gt;", '"': "&quot;", "'": "&#39;" }[c];
+    });
+  }
+
+  function destacar(texto, termos) {
+    var seguro = escaparHtml(texto);
+    termos.forEach(function (t) {
+      if (!t) return;
+      var re = new RegExp("(" + t.replace(/[.*+?^${}()|[\]\\]/g, "\\$&") + ")", "gi");
+      seguro = seguro.replace(re, "<mark>$1</mark>");
+    });
+    return seguro;
+  }
+
+  function trecho(texto, termos) {
+    var baixo = texto.toLowerCase();
+    var pos = -1;
+    for (var i = 0; i < termos.length; i++) {
+      pos = baixo.indexOf(termos[i]);
+      if (pos !== -1) break;
+    }
+    if (pos === -1) pos = 0;
+    var ini = Math.max(0, pos - 55);
+    var fim = Math.min(texto.length, pos + 105);
+    var s = texto.slice(ini, fim).replace(/\s+/g, " ").trim();
+    return (ini > 0 ? "… " : "") + s + (fim < texto.length ? " …" : "");
+  }
+
+  var selecionado = -1;
+  var resultadosAtuais = [];
+
+  function executarBusca(consulta) {
+    var termos = consulta.toLowerCase().split(/\s+/).filter(function (t) { return t.length > 0; });
+    if (termos.length === 0) { fecharPainel(); return; }
+
+    resultadosAtuais = [];
+    indice.forEach(function (item) {
+      var alvo = (item.titulo + " " + item.texto).toLowerCase();
+      if (termos.every(function (t) { return alvo.indexOf(t) !== -1; })) {
+        var peso = item.titulo.toLowerCase().indexOf(termos[0]) !== -1 ? 0 : 1;
+        resultadosAtuais.push({ item: item, peso: peso });
+      }
+    });
+
+    resultadosAtuais.sort(function (a, b) { return a.peso - b.peso; });
+    resultadosAtuais = resultadosAtuais.slice(0, 40);
+    selecionado = -1;
+
+    if (resultadosAtuais.length === 0) {
+      painel.innerHTML = '<div class="vazio">Nenhum resultado para «' + escaparHtml(consulta) + '».</div>';
+    } else {
+      var html = '<div class="contagem">' + resultadosAtuais.length + " resultado(s)</div>";
+      resultadosAtuais.forEach(function (r, i) {
+        html += '<a class="item" role="option" data-i="' + i + '" href="#' + r.item.id + '">' +
+                '<div class="titulo">' + destacar(r.item.titulo, termos) + "</div>" +
+                '<div class="contexto">' + destacar(trecho(r.item.texto, termos), termos) + "</div></a>";
+      });
+      painel.innerHTML = html;
+    }
+    abrirPainel();
+  }
+
+  function abrirPainel() {
+    painel.classList.add("aberto");
+    campo.setAttribute("aria-expanded", "true");
+  }
+
+  function fecharPainel() {
+    painel.classList.remove("aberto");
+    campo.setAttribute("aria-expanded", "false");
+    selecionado = -1;
+  }
+
+  function moverSelecao(delta) {
+    var itens = painel.querySelectorAll(".item");
+    if (itens.length === 0) return;
+    if (selecionado >= 0) itens[selecionado].classList.remove("selecionado");
+    selecionado = (selecionado + delta + itens.length) % itens.length;
+    itens[selecionado].classList.add("selecionado");
+    itens[selecionado].scrollIntoView({ block: "nearest" });
+  }
+
+  campo.addEventListener("input", function () { executarBusca(campo.value.trim()); });
+
+  campo.addEventListener("keydown", function (ev) {
+    if (ev.key === "ArrowDown") { ev.preventDefault(); moverSelecao(1); }
+    else if (ev.key === "ArrowUp") { ev.preventDefault(); moverSelecao(-1); }
+    else if (ev.key === "Enter") {
+      var itens = painel.querySelectorAll(".item");
+      if (selecionado >= 0 && itens[selecionado]) { itens[selecionado].click(); }
+      else if (itens.length > 0) { itens[0].click(); }
+      fecharPainel();
+      campo.blur();
+    } else if (ev.key === "Escape") {
+      fecharPainel(); campo.blur();
+    }
+  });
+
+  painel.addEventListener("click", function (ev) {
+    var alvo = ev.target.closest(".item");
+    if (alvo) {
+      fecharPainel();
+      campo.value = "";
+      setTimeout(function () { campo.blur(); }, 0);
+    }
+  });
+
+  document.addEventListener("click", function (ev) {
+    if (!ev.target.closest(".busca-wrap")) fecharPainel();
+  });
+
+  /* Atalho "/" para focar a busca */
+  document.addEventListener("keydown", function (ev) {
+    var ativo = document.activeElement;
+    var digitando = ativo && (ativo.tagName === "INPUT" || ativo.tagName === "TEXTAREA" || ativo.isContentEditable);
+
+    if (ev.key === "/" && !digitando && !ev.ctrlKey && !ev.metaKey) {
+      ev.preventDefault();
+      campo.focus();
+      campo.select();
+    }
+    if (ev.key === "Escape" && digitando && ativo === campo) {
+      fecharPainel(); campo.blur();
+    }
+  });
+
+  /* ============================================================
+     5. IMPRESSÃO — expande todos os blocos recolhíveis
+     ============================================================ */
+  window.addEventListener("beforeprint", function () {
+    document.querySelectorAll("details").forEach(function (d) { d.open = true; });
+  });
+})();
+</script>
+
+</body>
+</html>

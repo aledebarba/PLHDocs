@@ -1,0 +1,30 @@
+{
+  "project_info": {
+    "project_number": "759515788941",
+    "firebase_url": "https://projeto-ihc-5530a-default-rtdb.firebaseio.com",
+    "project_id": "projeto-ihc-5530a",
+    "storage_bucket": "projeto-ihc-5530a.firebasestorage.app"
+  },
+  "client": [
+    {
+      "client_info": {
+        "mobilesdk_app_id": "1:759515788941:android:290247efd2fbd67f7414c4",
+        "android_client_info": {
+          "package_name": "com.example.flutter_application_1"
+        }
+      },
+      "oauth_client": [],
+      "api_key": [
+        {
+          "current_key": "AIzaSyA18sO6vs39_y8eNQXdAcsOjLEKqxTJGSM"
+        }
+      ],
+      "services": {
+        "appinvite_service": {
+          "other_platform_oauth_client": []
+        }
+      }
+    }
+  ],
+  "configuration_version": "1"
+}

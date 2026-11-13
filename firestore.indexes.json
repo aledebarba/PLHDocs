@@ -1,0 +1,13 @@
+{
+  "indexes": [
+    {
+      "collectionGroup": "reservas",
+      "queryScope": "COLLECTION",
+      "fields": [
+        { "fieldPath": "id_unidade", "order": "ASCENDING" },
+        { "fieldPath": "data_reserva", "order": "ASCENDING" }
+      ]
+    }
+  ],
+  "fieldOverrides": []
+}

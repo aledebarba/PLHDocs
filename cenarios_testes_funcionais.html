@@ -1,0 +1,82 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+<meta charset="utf-8">
+<title>Cenários de Testes Funcionais</title>
+<style>
+@page { size: landscape; margin: 1.5cm; }
+body { font-family: Arial, sans-serif; font-size: 10pt; color: #222; }
+h1 { color: #203864; font-size: 22pt; }
+h2 { color: #2f5597; font-size: 16pt; margin-top: 24px; }
+p { line-height: 1.35; }
+table { border-collapse: collapse; width: 100%; margin: 10px 0 20px; }
+th, td { border: 1px solid #7f8c9a; padding: 6px; vertical-align: top; }
+th { background: #d9e2f3; color: #1f1f1f; text-align: left; }
+tr { page-break-inside: avoid; }
+.id { width: 5%; white-space: nowrap; }
+.scenario { width: 23%; }
+.expected { width: 25%; }
+.bdd { width: 47%; }
+.note { background: #fff2cc; padding: 8px; border: 1px solid #d6b656; }
+</style>
+</head>
+<body>
+<h1>Cenários de Testes Funcionais</h1>
+<p><b>Escopo:</b> cadastro, atualização e exclusão de usuários e espaços; inativação de espaços; realização, aprovação, rejeição e cancelamento de reservas.</p>
+<p><b>Preparação:</b> execute em um projeto Firebase de teste, nunca em produção. Crie um administrador, dois moradores habilitados em apartamentos diferentes e um espaço disponível com capacidade 30, funcionamento 08:00–22:00 e custo 50. Use datas futuras sem conflitos. Para testes de salão, respeite a antecedência mínima de 48 horas, exceto quando o próprio caso verifica essa regra.</p>
+
+<h2>Usuários</h2>
+<table>
+<tr><th class="id">ID</th><th class="scenario">Cenário</th><th class="expected">Resultado esperado</th><th class="bdd">Comportamento BDD</th></tr>
+<tr><td>U01</td><td>Cadastrar usuário com dados válidos e apartamento ainda não utilizado.</td><td>Usuário aparece na lista e é criado com <code>ind_habilitado = 'S'</code>.</td><td><b>Dado</b> um administrador na tela de usuários, <b>E</b> um login e apartamento ainda não cadastrados, <b>Quando</b> preencher os campos válidos e salvar, <b>Então</b> o usuário deve ser criado e habilitado.</td></tr>
+<tr><td>U02</td><td>Tentar cadastrar com campos obrigatórios vazios, senha curta, CPF/telefone inválidos ou apartamento não numérico.</td><td>Cadastro bloqueado; nenhum documento criado.</td><td><b>Dado</b> o formulário de cadastro aberto, <b>Quando</b> preencher um ou mais campos com valores inválidos e salvar, <b>Então</b> o formulário deve indicar o erro e não criar o usuário.</td></tr>
+<tr><td>U03</td><td>Cadastrar usuário com login ou apartamento já associado a outra conta.</td><td>Cadastro recusado; dados existentes preservados.</td><td><b>Dado</b> que já existe um usuário com aquele login ou apartamento, <b>Quando</b> tentar cadastrar outro usuário com o mesmo valor, <b>Então</b> o cadastro deve ser recusado e o registro existente deve permanecer inalterado.</td></tr>
+<tr><td>U04</td><td>Editar dados de um usuário sem alterar o login.</td><td>Dados atualizados; senha permanece inalterada.</td><td><b>Dado</b> um usuário cadastrado, <b>Quando</b> alterar seus dados e salvar sem mudar o login, <b>Então</b> os novos valores devem aparecer no documento e a senha deve ser mantida.</td></tr>
+<tr><td>U05</td><td>Alterar o login para um nome ainda não utilizado.</td><td>Documento antigo removido e novo criado; senha e data de cadastro preservadas.</td><td><b>Dado</b> um usuário cadastrado e um login novo disponível, <b>Quando</b> alterar o login e salvar, <b>Então</b> o documento deve passar a usar o novo login, preservando senha e data de cadastro.</td></tr>
+<tr><td>U06</td><td>Alterar o login para um já utilizado ou atribuir o apartamento de outro usuário.</td><td>Alteração recusada; registros originais preservados.</td><td><b>Dado</b> que outro usuário já utiliza o login ou apartamento informado, <b>Quando</b> tentar salvar a edição, <b>Então</b> a alteração deve ser recusada e os dados existentes devem permanecer iguais.</td></tr>
+<tr><td>U07</td><td>Excluir usuário; testar cancelar e confirmar a ação.</td><td>Cancelar mantém o usuário; confirmar remove o documento.</td><td><b>Dado</b> um usuário listado, <b>Quando</b> abrir a exclusão e cancelar, <b>Então</b> ele deve continuar cadastrado; <b>Quando</b> repetir e confirmar, <b>Então</b> seu documento deve ser removido.</td></tr>
+</table>
+
+<h2>Espaços</h2>
+<table>
+<tr><th class="id">ID</th><th class="scenario">Cenário</th><th class="expected">Resultado esperado</th><th class="bdd">Comportamento BDD</th></tr>
+<tr><td>E01</td><td>Cadastrar espaço com nome, capacidade, horários e custo válidos.</td><td>Espaço criado e disponível para seleção nas reservas.</td><td><b>Dado</b> um administrador na tela de espaços, <b>E</b> dados válidos para um novo espaço, <b>Quando</b> salvar o cadastro, <b>Então</b> o espaço deve aparecer na lista com disponibilidade ativa.</td></tr>
+<tr><td>E02</td><td>Cadastrar espaço sem nome ou com nome já existente.</td><td>Cadastro recusado; espaço existente preservado.</td><td><b>Dado</b> que o nome está vazio ou já identifica um espaço cadastrado, <b>Quando</b> tentar salvar, <b>Então</b> o sistema deve recusar o cadastro e manter os espaços existentes.</td></tr>
+<tr><td>E03</td><td>Informar capacidade fora de 1–50, custo fora de 0–500 ou horários inválidos/invertidos.</td><td>Salvamento bloqueado com mensagem de validação.</td><td><b>Dado</b> o formulário de espaço, <b>Quando</b> informar capacidade ou custo fora dos limites, horário inválido ou fechamento igual/anterior à abertura, <b>Então</b> o sistema deve impedir o salvamento e informar o problema.</td></tr>
+<tr><td>E04</td><td>Atualizar capacidade, horários, custo ou regras sem mudar o nome.</td><td>Atributos atualizados no registro existente.</td><td><b>Dado</b> um espaço cadastrado, <b>Quando</b> alterar seus atributos e salvar sem mudar o nome, <b>Então</b> o documento existente deve refletir os novos valores.</td></tr>
+<tr><td>E05</td><td>Renomear espaço para um nome disponível e, em outro teste, para um nome existente.</td><td>Nome disponível: novo documento criado e antigo removido. Nome existente: alteração recusada.</td><td><b>Dado</b> um espaço cadastrado, <b>E</b> um nome novo disponível, <b>Quando</b> renomeá-lo e salvar, <b>Então</b> o novo registro deve substituir o antigo; <b>Quando</b> usar nome já existente, <b>Então</b> a operação deve ser recusada e o original preservado.</td></tr>
+<tr><td>E06</td><td>Inativar espaço.</td><td>Espaço deixa de aparecer para novas reservas; verificar efeito nas reservas associadas.</td><td><b>Dado</b> um espaço disponível com reservas associadas, <b>Quando</b> marcá-lo como indisponível e salvar, <b>Então</b> ele não deve ser oferecido para novas reservas; <b>E</b> deve-se conferir o status das reservas existentes.</td></tr>
+<tr><td>E07</td><td>Excluir espaço; testar cancelar e confirmar.</td><td>Cancelar mantém o espaço; confirmar o remove permanentemente.</td><td><b>Dado</b> um espaço cadastrado, <b>Quando</b> abrir a exclusão e cancelar, <b>Então</b> ele deve permanecer; <b>Quando</b> confirmar, <b>Então</b> o documento do espaço deve ser removido.</td></tr>
+</table>
+
+<h2>Reservas</h2>
+<table>
+<tr><th class="id">ID</th><th class="scenario">Cenário</th><th class="expected">Resultado esperado</th><th class="bdd">Comportamento BDD</th></tr>
+<tr><td>R01</td><td>Criar reserva válida em espaço disponível, dentro do horário e da capacidade.</td><td>Reserva criada com <code>PENDENTE</code>, usuário, unidade, data e horários corretos. A quantidade inclui o proprietário.</td><td><b>Dado</b> um morador associado a uma unidade e um espaço disponível, <b>E</b> uma data e horário válidos, <b>Quando</b> preencher os dados e reservar, <b>Então</b> deve ser criado um documento com status <code>PENDENTE</code> e os dados informados.</td></tr>
+<tr><td>R02</td><td>Tentar reservar espaço indisponível.</td><td>Espaço não deve ser selecionável.</td><td><b>Dado</b> um espaço marcado como indisponível, <b>Quando</b> o morador abrir o formulário de reserva, <b>Então</b> esse espaço não deve aparecer nas opções.</td></tr>
+<tr><td>R03</td><td>Informar horário inválido, início igual ou posterior ao fim ou horário fora do funcionamento.</td><td>Reserva não criada; erro apresentado.</td><td><b>Dado</b> um espaço com horário de funcionamento definido, <b>Quando</b> informar horário malformado, fora do funcionamento ou com início igual/posterior ao fim, <b>Então</b> a reserva deve ser bloqueada.</td></tr>
+<tr><td>R04</td><td>Reservar salão com menos de 48 horas de antecedência e repetir com antecedência suficiente.</td><td>Primeira tentativa recusada; segunda pode prosseguir se os demais dados forem válidos.</td><td><b>Dado</b> que o espaço é um salão, <b>Quando</b> tentar reservar para menos de 48 horas à frente, <b>Então</b> o sistema deve bloquear a operação; <b>Quando</b> usar antecedência suficiente, <b>Então</b> deve permitir prosseguir com as demais validações.</td></tr>
+<tr><td>R05</td><td>Exceder a capacidade contando o proprietário; repetir no limite permitido.</td><td>Acima da capacidade: recusada. No limite: permitida, se os demais dados forem válidos.</td><td><b>Dado</b> um espaço com capacidade definida, <b>Quando</b> informar convidados mais proprietário acima do limite, <b>Então</b> a reserva deve ser bloqueada; <b>Quando</b> o total for igual ao limite, <b>Então</b> deve ser aceita pelas validações de capacidade.</td></tr>
+<tr><td>R06</td><td>Tentar reservar o mesmo espaço na mesma data mais de uma vez.</td><td>Segunda tentativa recusada.</td><td><b>Dado</b> que já existe uma reserva para aquele espaço e data, <b>Quando</b> outro usuário tentar reservar o mesmo espaço na mesma data, <b>Então</b> a nova reserva deve ser bloqueada.</td></tr>
+<tr><td>R07</td><td>Exceder o limite de reservas futuras da unidade ou criar horários sobrepostos.</td><td>Nova reserva bloqueada nos casos de limite ou conflito.</td><td><b>Dado</b> que a unidade já possui duas reservas futuras ativas, <b>Quando</b> tentar criar uma terceira, <b>Então</b> a operação deve ser bloqueada; <b>E</b>, havendo sobreposição no mesmo dia, a reserva conflitante também deve ser recusada.</td></tr>
+<tr><td>R08</td><td>Administrador aprovar reserva pendente.</td><td>Status passa a <code>ACEITA</code>; morador recebe notificação.</td><td><b>Dado</b> uma reserva <code>PENDENTE</code>, <b>Quando</b> o administrador aprová-la, <b>Então</b> o status deve mudar para <code>ACEITA</code> e o morador deve receber notificação.</td></tr>
+<tr><td>R09</td><td>Administrador rejeitar sem motivo e depois com motivo.</td><td>Sem motivo: ação bloqueada. Com motivo: status <code>REJEITADA</code>, motivo salvo e notificação enviada.</td><td><b>Dado</b> uma reserva <code>PENDENTE</code>, <b>Quando</b> o administrador tentar rejeitá-la sem motivo, <b>Então</b> a ação deve ser bloqueada; <b>Quando</b> informar um motivo e confirmar, <b>Então</b> o motivo e o status devem ser salvos e o morador notificado.</td></tr>
+<tr><td>R10</td><td>Morador tenta cancelar reserva pertencente a outro usuário.</td><td>Cancelamento recusado; status não muda.</td><td><b>Dado</b> uma reserva pertencente a outro morador, <b>Quando</b> o usuário atual tentar cancelá-la, <b>Então</b> a operação deve ser recusada e o documento deve permanecer inalterado.</td></tr>
+<tr><td>R11</td><td>Cancelar própria reserva <code>ACEITA</code> com mais de 24 horas até o início.</td><td>Status passa a <code>CANCELADA</code> e data de cancelamento é registrada.</td><td><b>Dado</b> uma reserva <code>ACEITA</code> do próprio usuário com mais de 24 horas até o início, <b>Quando</b> confirmar o cancelamento, <b>Então</b> o status deve mudar para <code>CANCELADA</code> e a data de cancelamento deve ser registrada.</td></tr>
+<tr><td>R12</td><td>Cancelar própria reserva <code>ACEITA</code> faltando menos de 24 horas, ou após o início.</td><td>Status não muda; mensagem de prazo exibida e registrada no log.</td><td><b>Dado</b> uma reserva <code>ACEITA</code> do próprio usuário com menos de 24 horas até o início, <b>Quando</b> tentar cancelá-la, <b>Então</b> o status deve permanecer <code>ACEITA</code> e a mensagem “Cancelamento não pode ser realizado para reservas devido ao prazo ser inferior a 24 horas do evento” deve ser exibida e registrada no log.</td></tr>
+<tr><td>R13</td><td>Cancelar exatamente 24 horas antes do início.</td><td>Pelo código atual, exatamente 24 horas não é “inferior”; cancelamento deve ser permitido.</td><td><b>Dado</b> uma reserva <code>ACEITA</code> do próprio usuário cujo início ocorre exatamente em 24 horas, <b>Quando</b> solicitar o cancelamento, <b>Então</b> o sistema deve permitir a operação.</td></tr>
+<tr><td>R14</td><td>Cancelar própria reserva <code>PENDENTE</code> faltando menos de 24 horas.</td><td>A regra atual de 24 horas aplica-se somente a reservas <code>ACEITA</code>; confirmar se isso é esperado.</td><td><b>Dado</b> uma reserva <code>PENDENTE</code> do próprio usuário com menos de 24 horas até o início, <b>Quando</b> solicitar o cancelamento, <b>Então</b> deve-se verificar que o comportamento atual não aplica a validação de prazo reservada às <code>ACEITA</code>.</td></tr>
+<tr><td>R15</td><td>Usar “Excluir” em Minhas Reservas e confirmar.</td><td>A reserva é cancelada; o documento não é apagado.</td><td><b>Dado</b> uma reserva exibida em Minhas Reservas, <b>Quando</b> escolher “Excluir” e confirmar, <b>Então</b> o sistema deve tentar cancelar a reserva, não apagar o documento.</td></tr>
+</table>
+
+<h2>Observações para aceite</h2>
+<ul>
+<li>“Excluir” em Minhas Reservas altera o status; não remove o documento.</li>
+<li>Ao inativar um espaço, o código tenta mudar para <code>REJEITADA</code> as reservas associadas, independentemente do status. Verifique o efeito em reservas aceitas, realizadas ou canceladas.</li>
+<li>O cadastro verifica reserva existente para o mesmo espaço/data sem filtrar status. Assim, uma reserva cancelada pode continuar bloqueando a data.</li>
+<li>Há diferenças de status entre trechos do código: a interface usa <code>ACEITA</code>/<code>REJEITADA</code>, enquanto parte do serviço usa <code>APROVADA</code>/<code>RECUSADA</code>. Confirme no Firestore os valores efetivamente gravados.</li>
+<li>As regras atuais do Firestore permitem leitura e escrita abertas. Estes cenários validam os fluxos do aplicativo, não a segurança contra acesso direto ao Firestore.</li>
+</ul>
+<p class="note"><b>Importante:</b> execute os casos em um projeto Firebase de teste. Exclusões de usuários e espaços são permanentes.</p>
+</body>
+</html>

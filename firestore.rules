@@ -1,0 +1,32 @@
+rules_version = '2';
+
+service cloud.firestore {
+  match /databases/{database}/documents {
+    function unidadeValida(data) {
+      return data.keys().hasAll(['id_unidade'])
+        && data.id_unidade is string
+        && data.id_unidade.size() > 0;
+    }
+
+    match /reservas/{reservaId} {
+      allow create: if unidadeValida(request.resource.data);
+      allow update: if unidadeValida(request.resource.data);
+      allow read, delete: if true;
+    }
+
+    // O aplicativo usa autenticação própria com SharedPreferences, sem Firebase Auth.
+    // Os demais documentos permanecem disponíveis para não alterar o fluxo atual.
+    match /users/{userId} {
+      allow read, write: if true;
+    }
+    match /espacos/{espacoId} {
+      allow read, write: if true;
+    }
+    match /notificacoes/{notificacaoId} {
+      allow read, write: if true;
+    }
+    match /limites_reservas_por_unidade/{unidadeId} {
+      allow read, write: if true;
+    }
+  }
+}

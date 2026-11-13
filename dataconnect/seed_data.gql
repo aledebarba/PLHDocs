@@ -1,0 +1,58 @@
+mutation SeedData @auth(level: NO_ACCESS) @transaction {
+  user_insertMany(data: [
+    {
+      id: "6775992f-930a-4d16-b543-66a59218a1b1",
+      displayName: "John Doe",
+      email: "john.doe@example.com",
+      role: "member",
+      createdAt: "2024-04-03T12:00:00Z"
+    },
+    {
+      id: "7e670790-5c3a-4711-9c17-328763a8826b",
+      displayName: "Jane Smith",
+      email: "jane.smith@example.com",
+      role: "admin",
+      createdAt: "2024-04-03T13:00:00Z"
+    }
+  ])
+  commonArea_insertMany(data: [
+    {
+      id: "b740c66b-8b52-4258-a104-19e498230579",
+      name: "Meeting Room 1",
+      description: "Small meeting room for up to 4 people.",
+      bookingDuration: 60,
+      capacity: 4,
+      createdAt: "2024-04-03T14:00:00Z"
+    },
+    {
+      id: "151f949b-c3af-4418-8075-2f15928ae7ae",
+      name: "Cafeteria",
+      description: "Large cafeteria with seating for 50 people.",
+      bookingDuration: 120,
+      capacity: 50,
+      createdAt: "2024-04-03T15:00:00Z"
+    }
+  ])
+  booking_insertMany(data: [
+    {
+      id: "0a85b61b-00a1-41d3-9f1a-04d074ef72c5",
+      userId: "6775992f-930a-4d16-b543-66a59218a1b1",
+      commonAreaId: "b740c66b-8b52-4258-a104-19e498230579",
+      bookingDate: "2024-04-05",
+      startTime: "09:00",
+      endTime: "10:00",
+      status: "confirmed",
+      createdAt: "2024-04-03T16:00:00Z"
+    },
+    {
+      id: "23f4f269-4b3a-487a-b58e-48993d71b16b",
+      userId: "7e670790-5c3a-4711-9c17-328763a8826b",
+      commonAreaId: "151f949b-c3af-4418-8075-2f15928ae7ae",
+      bookingDate: "2024-04-06",
+      startTime: "12:00",
+      endTime: "13:00",
+      status: "pending",
+      createdAt: "2024-04-03T17:00:00Z"
+    }
+  ])
+}

@@ -1,0 +1,31 @@
+mutation AddNewBooking($commonAreaId: UUID!, $userId: UUID!, $bookingDate: Date!, $endTime: String!, $startTime: String!, $status: String!) @auth(level: USER) {
+  booking_insert(data: {commonAreaId: $commonAreaId, userId: $userId, bookingDate: $bookingDate, endTime: $endTime, startTime: $startTime, status: $status, createdAt_expr: "request.time"})
+}
+
+query ListCommonAreas @auth(level: PUBLIC, insecureReason: "This operation is safe to expose to the public") {
+  commonAreas {
+    id
+    name
+    description
+    capacity
+    bookingDuration
+    imageUrl
+  }
+}
+
+mutation UpdateUserUnitNumber($id: UUID!, $unitNumber: String) @auth(level: USER) {
+  user_update(id: $id, data: {unitNumber: $unitNumber})
+}
+
+query GetMyBookings($userId: UUID!) @auth(level: USER) {
+  bookings(where: {userId: {eq: $userId}}) {
+    id
+    commonArea {
+      name
+    }
+    bookingDate
+    startTime
+    endTime
+    status
+  }
+}

@@ -1,0 +1,43 @@
+type User @table {
+  email: String!
+  displayName: String!
+  role: String!
+  createdAt: Timestamp!
+  phoneNumber: String
+  unitNumber: String
+}
+
+type CommonArea @table {
+  name: String!
+  description: String!
+  bookingDuration: Int!
+  createdAt: Timestamp!
+  capacity: Int
+  imageUrl: String
+  rules: String
+}
+
+type Booking @table {
+  user: User!
+  commonArea: CommonArea!
+  startTime: String!
+  endTime: String!
+  bookingDate: Date!
+  status: String!
+  createdAt: Timestamp!
+  notes: String
+}
+
+type Rule @table {
+  commonArea: CommonArea!
+  description: String!
+  createdAt: Timestamp!
+  penalty: String
+}
+
+type Availability @table {
+  commonArea: CommonArea!
+  dayOfWeek: String!
+  openingTime: String!
+  closingTime: String!
+}
